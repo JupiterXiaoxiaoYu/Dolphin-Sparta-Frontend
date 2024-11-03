@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 import { useGameStore } from './store/gameStore';
 import { Shop } from './components/Shop';
 import { Dolphin } from './components/Dolphin';
-import { AnimatedDolphin } from './components/AnimatedDolphin';
+import { PetPreview } from './components/PetPreview';
+import { ISpriteConfig } from './types/ISpriteConfig';
 
 function App() {
   const { 
@@ -59,6 +60,54 @@ function App() {
     return () => clearInterval(interval);
   }, [updateGrowthProgress]);
 
+  // 添加精灵配置
+  const spriteConfig: ISpriteConfig = {
+    "name": "Starphin Shimeji",
+    "imageSrc": "Starphin Shimeji.png",
+    "frameSize": 128,
+    "credit": {
+        "link": "https://www.dropbox.com/sh/r1ofen1npg78vyp/AAAoCzy51pRvaFDMmNs_fngSa?dl=0"
+    },
+    "states": {
+        "stand": {
+            "spriteLine": 1,
+            "frameMax": 1
+        },
+        "walk": {
+            "spriteLine": 2,
+            "frameMax": 4
+        },
+        "sit": {
+            "spriteLine": 3,
+            "frameMax": 1
+        },
+        "greet": {
+            "spriteLine": 4,
+            "frameMax": 4
+        },
+        "crawl": {
+            "spriteLine": 8,
+            "frameMax": 8
+        },
+        "climb": {
+            "spriteLine": 9,
+            "frameMax": 8
+        },
+        "jump": {
+            "spriteLine": 5,
+            "frameMax": 1
+        },
+        "fall": {
+            "spriteLine": 6,
+            "frameMax": 3
+        },
+        "drag": {
+            "spriteLine": 7,
+            "frameMax": 1
+        }
+    }
+  };  
+
   return (
     <div className="ocean-bg min-h-screen p-8 relative">
       <div className="wave-container">
@@ -114,7 +163,7 @@ function App() {
         />
       ))}
       <div className="coral-decoration" />
-      <AnimatedDolphin />
+      <PetPreview spriteConfig={spriteConfig} />
     </div>
   );
 }

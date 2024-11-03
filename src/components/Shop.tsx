@@ -11,6 +11,7 @@ interface Props {
   onBuyMedicine: (amount: number) => void;
   onBuyDolphin: (type: 'spear' | 'sword') => void;
   onBuySlot: () => void;
+  onCollectAllCoins: () => void;
 }
 
 export const Shop: React.FC<Props> = ({ 
@@ -22,7 +23,8 @@ export const Shop: React.FC<Props> = ({
   onBuyFood, 
   onBuyMedicine,
   onBuyDolphin,
-  onBuySlot
+  onBuySlot,
+  onCollectAllCoins
 }) => {
   const addCoins = useGameStore(state => state.addCoins);
 
@@ -81,6 +83,12 @@ export const Shop: React.FC<Props> = ({
             className="rpg-button px-4 py-2 rounded"
           >
             购买栏位 (200金币)
+          </button>
+          <button
+            onClick={onCollectAllCoins}
+            className="rpg-button px-4 py-2 rounded bg-red-900/50 hover:bg-red-800/50"
+          >
+            对抗邪恶巨鲸
           </button>
         </div>
 

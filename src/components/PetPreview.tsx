@@ -8,24 +8,26 @@ interface PetPreviewProps {
 
 export const PetPreview: React.FC<PetPreviewProps> = ({ spriteConfig }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<BottomAnimation | null>(null);
 
   useEffect(() => {
-    let animation: BottomAnimation | null = null;
-    
-    if (containerRef.current) {
-      animation = new BottomAnimation({
+    if (containerRef.current && !animationRef.current) {
+      animationRef.current = new BottomAnimation({
         config: spriteConfig,
         initialState: 'walk',
         scale: 1,
         frameRate: 9,
-        container: containerRef.current
+        container: containerRef.current,
       });
     }
 
     return () => {
-      animation?.destroy();
+      if (animationRef.current) {
+        animationRef.current.destroy();
+        animationRef.current = null;
+      }
     };
-  }, [spriteConfig]);
+  }, []);
 
   return (
     <div 
@@ -36,7 +38,8 @@ export const PetPreview: React.FC<PetPreviewProps> = ({ spriteConfig }) => {
         left: 0,
         width: '100%',
         height: '200px',
-        pointerEvents: 'auto'
+        pointerEvents: 'auto',
+        zIndex: 9999
       }} 
     />
   );

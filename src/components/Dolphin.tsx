@@ -4,28 +4,29 @@ import { Dolphin as DolphinType } from '../types/game';
 interface Props {
   dolphin: DolphinType;
   onFeed: () => void;
-  onPet: () => void;
   onHeal: () => void;
   onCollect: () => void;
+  onSell: () => void;
 }
 
-export const Dolphin: React.FC<Props> = ({ dolphin, onFeed, onPet, onHeal, onCollect }) => {
+export const Dolphin: React.FC<Props> = ({ dolphin, onFeed, onHeal, onCollect, onSell }) => {
   const isWarrior = dolphin.stage === 'warrior';
-  const timeSinceLastPet = Date.now() - dolphin.lastPetted;
-  const canPet = timeSinceLastPet >= 30000;
   const [timeLeft, setTimeLeft] = useState<string>('');
+
+  const GROWTH_TIME = 60000;
 
   useEffect(() => {
     if (dolphin.stage === 'baby') {
       const timer = setInterval(() => {
         const now = Date.now();
-        const timeNeeded = 60000 - (dolphin.growthProgress / 100 * 60000);
         const timePassed = now - dolphin.bornTime;
-        const remaining = Math.max(0, timeNeeded - timePassed);
+        const totalTime = GROWTH_TIME;
+        const remaining = Math.max(0, totalTime - timePassed);
         
         if (remaining > 0) {
-          const seconds = Math.ceil(remaining / 1000);
-          setTimeLeft(`${Math.floor(seconds / 60)}分${seconds % 60}秒`);
+          const minutes = Math.floor(remaining / 60000);
+          const seconds = Math.floor((remaining % 60000) / 1000);
+          setTimeLeft(`${minutes}分${seconds}秒`);
         } else {
           setTimeLeft('即将成年');
         }
@@ -33,7 +34,7 @@ export const Dolphin: React.FC<Props> = ({ dolphin, onFeed, onPet, onHeal, onCol
 
       return () => clearInterval(timer);
     }
-  }, [dolphin]);
+  }, [dolphin.stage, dolphin.bornTime]);
 
   return (
     <div className={`rpg-panel rpg-border p-4 rounded-lg ${dolphin.isIll ? 'bg-red-900/50' : ''}`}>
@@ -79,17 +80,6 @@ export const Dolphin: React.FC<Props> = ({ dolphin, onFeed, onPet, onHeal, onCol
             喂食
           </button>
           
-          {!isWarrior && (
-            <button
-              onClick={onPet}
-              disabled={!canPet}
-              className={`rpg-button px-3 py-1 rounded text-sm ${
-                !canPet ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-            >
-              {canPet ? '抚摸' : '冷却中'}
-            </button>
-          )}
 
           {dolphin.isIll && (
             <button
@@ -109,6 +99,13 @@ export const Dolphin: React.FC<Props> = ({ dolphin, onFeed, onPet, onHeal, onCol
               收集金币 ({dolphin.coins})
             </button>
           )}
+
+          <button
+            onClick={onSell}
+            className="rpg-button px-3 py-1 rounded text-sm bg-red-900/50 hover:bg-red-800/50"
+          >
+            出售 ({Math.floor(dolphin.type === 'spear' ? 50 : 75)}金币)
+          </button>
         </div>
       </div>
     </div>

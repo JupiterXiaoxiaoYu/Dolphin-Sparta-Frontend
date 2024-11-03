@@ -21,10 +21,11 @@ export interface GameState {
   addDolphin: (type: 'spear' | 'sword') => void;
   updateGrowthProgress: () => void;
   feedDolphin: (id: string) => void;
-  petDolphin: (id: string) => void;
   healDolphin: (id: string) => void;
   collectCoins: (id: string) => void;
   buyFood: (amount: number) => void;
   buyMedicine: (amount: number) => void;
   buySlot: () => void;
+  sellDolphin: (id: string) => void;
+  collectAllCoins: () => void;
 }

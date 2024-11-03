@@ -79,29 +79,6 @@ export const useGameStore = create<GameState>((set, get) => ({
     }));
   },
 
-  petDolphin: (id) => {
-    set((state) => ({
-      dolphins: state.dolphins.map(dolphin => {
-        if (dolphin.id === id && dolphin.stage === 'baby') {
-          const timeSinceLastPet = Date.now() - dolphin.lastPetted;
-          if (timeSinceLastPet >= 30000) {
-            const additionalProgress = 20;
-            const newProgress = Math.min(100, dolphin.growthProgress + additionalProgress);
-            const newStage = newProgress >= 100 ? 'warrior' : 'baby';
-            
-            return {
-              ...dolphin,
-              lastPetted: Date.now(),
-              growthProgress: newProgress,
-              stage: newStage
-            };
-          }
-        }
-        return dolphin;
-      })
-    }));
-  },
-
   healDolphin: (id) => {
     const { medicine } = get();
     const dolphin = get().dolphins.find(d => d.id === id);
@@ -165,5 +142,35 @@ export const useGameStore = create<GameState>((set, get) => ({
         maxSlots: state.maxSlots + 1
       }));
     }
-  }
+  },
+
+  sellDolphin: (id: string) => {
+    const dolphin = get().dolphins.find(d => d.id === id);
+    if (!dolphin) return;
+    
+    const sellPrice = Math.floor(DOLPHIN_COST[dolphin.type] / 2);
+    
+    set(state => ({
+      coins: state.coins + sellPrice,
+      dolphins: state.dolphins.filter(d => d.id !== id)
+    }));
+  },
+
+  collectAllCoins: () => {
+    const { dolphins } = get();
+    const totalCoins = dolphins.reduce((sum, dolphin) => {
+      if (dolphin.stage === 'warrior' && !dolphin.isIll) {
+        return sum + dolphin.coins;
+      }
+      return sum;
+    }, 0);
+
+    set((state) => ({
+      coins: state.coins + totalCoins,
+      dolphins: state.dolphins.map(d => ({
+        ...d,
+        coins: 0
+      }))
+    }));
+  },
 }));

@@ -1,5 +1,5 @@
-import { ISpriteConfig } from '../types/ISpriteConfig';
 import Phaser from 'phaser';
+import { ISpriteConfig } from '../types/ISpriteConfig';
 
 interface BottomAnimationProps {
     config: ISpriteConfig;
@@ -20,6 +20,12 @@ class AnimationScene extends Phaser.Scene {
     private idleTimer: number = 0;
     private currentBehavior: 'moving' | 'idle' = 'moving';
     private targetX?: number;
+    private isDragging: boolean = false;
+    private dragStartTime: number = 0;
+    private dragStartX: number = 0;
+    private dragStartY: number = 0;
+    private readonly CLICK_THRESHOLD = 200; // 毫秒
+    private readonly MOVE_THRESHOLD = 5; // 像素
 
     constructor(config: ISpriteConfig, initialState: string, frameRate: number) {
         super({ key: 'AnimationScene' });
@@ -38,8 +44,9 @@ class AnimationScene extends Phaser.Scene {
     }
 
     private getRandomIdleState(): string {
-        // 随机选择一个非walk的状态
-        return this.states[Math.floor(Math.random() * this.states.length)];
+        // 随机选择一个非walk且非drag的状态
+        const availableStates = this.states.filter(state => state !== 'walk' && state !== 'drag' && state !== 'fall');
+        return availableStates[Math.floor(Math.random() * availableStates.length)];
     }
 
     private pickNewBehavior() {
@@ -73,7 +80,7 @@ class AnimationScene extends Phaser.Scene {
     }
 
     update(time: number, delta: number) {
-        if (!this.sprite) return;
+        if (!this.sprite || this.isDragging) return;
 
         // 更新计时器
         this.idleTimer -= delta;
@@ -198,11 +205,56 @@ class AnimationScene extends Phaser.Scene {
         );
         
         this.sprite.setDisplaySize(this.frameSize, this.frameSize);
-        this.sprite.setInteractive();
+        this.sprite.setInteractive({ useHandCursor: true });
 
-        // 添加点击事件
-        this.sprite.on('pointerdown', () => {
-            this.nextState();
+        // 修改 create 方法中的事件处理部分
+        this.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+            this.dragStartTime = Date.now();
+            this.dragStartX = pointer.x;
+            this.dragStartY = pointer.y;
+            this.isDragging = false; // 初始设置为 false
+        });
+
+        this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+            if (this.sprite && this.dragStartTime > 0) {
+                const deltaX = Math.abs(pointer.x - this.dragStartX);
+                const deltaY = Math.abs(pointer.y - this.dragStartY);
+                
+                // 如果移动距离超过阈值，则认为是拖拽
+                if (deltaX > this.MOVE_THRESHOLD || deltaY > this.MOVE_THRESHOLD) {
+                    this.isDragging = true;
+                    this.currentState = 'drag';
+                    this.playCurrentState();
+                    this.sprite.x = pointer.x;
+                    this.sprite.y = pointer.y;
+                }
+            }
+        });
+
+        this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+            const clickDuration = Date.now() - this.dragStartTime;
+            
+            if (this.isDragging && this.sprite) {
+                // 处理拖拽结束
+                this.isDragging = false;
+                this.currentState = 'fall';
+                this.playCurrentState();
+
+                this.tweens.add({
+                    targets: this.sprite,
+                    y: this.cameras.main.height - this.frameSize / 2,
+                    duration: 500,
+                    ease: 'Bounce.Out',
+                    onComplete: () => {
+                        this.pickNewBehavior();
+                    }
+                });
+            } else if (clickDuration < this.CLICK_THRESHOLD) {
+                // 处理点击事件
+                this.nextState();
+            }
+            
+            this.dragStartTime = 0;
         });
 
         // 设置初始状态
@@ -216,12 +268,18 @@ class AnimationScene extends Phaser.Scene {
     }
 
     private nextState() {
+        // 获取可用状态（排除 drag）
+        const availableStates = this.states.filter(state => (state !== 'drag' && state !== 'fall'));
+        
         // 获取当前状态的索引
-        const currentIndex = this.states.indexOf(this.currentState);
-        // 计算下一个状态的索引（循环）
-        const nextIndex = (currentIndex + 1) % this.states.length;
+        const currentIndex = availableStates.indexOf(this.currentState);
+        
+        // 如果当前状态不在可用状态列表中，从第一个开始
+        const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % availableStates.length;
+        
         // 更新当前状态
-        this.currentState = this.states[nextIndex];
+        this.currentState = availableStates[nextIndex];
+        
         // 播放新状态的动画
         this.playCurrentState();
     }

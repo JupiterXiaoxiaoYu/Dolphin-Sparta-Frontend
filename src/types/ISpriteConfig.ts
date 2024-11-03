@@ -50,6 +50,7 @@ export interface ISpriteConfig {
     states: {
         [key: string]: ISpriteState;
     },
+    frames: number,
 }
 
 export interface IPetObject {

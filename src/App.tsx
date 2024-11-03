@@ -4,6 +4,7 @@ import { Shop } from './components/Shop';
 import { Dolphin } from './components/Dolphin';
 import { PetPreview } from './components/PetPreview';
 import { ISpriteConfig } from './types/ISpriteConfig';
+import { MusicPlayer } from './components/MusicPlayer';
 
 // 在 App.tsx 组件外部定义
 const SPRITE_CONFIG: ISpriteConfig = {
@@ -124,6 +125,9 @@ function App() {
 
   return (
     <div className="ocean-bg">
+      {/* 添加音乐播放器 */}
+      <MusicPlayer />
+      
       {/* 背景层 */}
       <div className="absolute inset-0">
         {/* 波浪 */}

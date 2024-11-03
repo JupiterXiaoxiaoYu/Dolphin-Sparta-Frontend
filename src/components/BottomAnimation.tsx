@@ -230,7 +230,7 @@ class AnimationScene extends Phaser.Scene {
                 this.tweens.add({
                     targets: sprite,
                     y: this.cameras.main.height - spriteData.frameSize / 2,
-                    duration: 500,
+                    duration: 2000,
                     ease: 'Bounce.Out',
                     onComplete: () => {
                         this.pickNewBehavior(spriteData);

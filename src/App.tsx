@@ -94,7 +94,7 @@ function App() {
       dolphins: state.dolphins.map(dolphin => ({
         ...dolphin,
         satiety: Math.max(0, dolphin.satiety - 5),
-        isIll: dolphin.satiety === 0 && !dolphin.isIll && Math.random() < 0.3
+        isIll: dolphin.satiety <= 0 ? true : dolphin.isIll
       }))
     }));
   }, []);

@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react';
+import React, { useEffect, useCallback, useState, useMemo } from 'react';
 import { useGameStore } from './store/gameStore';
 import { Shop } from './components/Shop';
 import { Dolphin } from './components/Dolphin';
@@ -113,6 +113,15 @@ function App() {
     };
   }, []);
 
+  const spriteConfigs = useMemo(() => 
+    dolphins.map((dolphin, index) => ({
+      ...SPRITE_CONFIG,
+      id: dolphin.id,
+      name: `Starphin-${dolphin.id}`
+    })), 
+    [dolphins]
+  );
+
   return (
     <div className="ocean-bg min-h-screen p-8 relative">
       <div className="wave-container">
@@ -169,15 +178,7 @@ function App() {
         />
       ))}
       <div className="coral-decoration" />
-      {dolphins.map((dolphin) => (
-        <PetPreview 
-          key={`pet-${dolphin.id}`}
-          spriteConfig={{
-            ...SPRITE_CONFIG,
-            name: `${SPRITE_CONFIG.name}-${dolphin.id}`
-          }}
-        />
-      ))}
+      <PetPreview configs={spriteConfigs} />
     </div>
   );
 }

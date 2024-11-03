@@ -12,6 +12,9 @@ export const PetPreview: React.FC<PetPreviewProps> = ({ spriteConfig }) => {
 
   useEffect(() => {
     if (containerRef.current && !animationRef.current) {
+      const containerId = `pet-container-${spriteConfig.name}`;
+      containerRef.current.id = containerId;
+      
       animationRef.current = new BottomAnimation({
         config: spriteConfig,
         initialState: 'walk',
@@ -27,7 +30,7 @@ export const PetPreview: React.FC<PetPreviewProps> = ({ spriteConfig }) => {
         animationRef.current = null;
       }
     };
-  }, []);
+  }, [spriteConfig.name]);
 
   return (
     <div 

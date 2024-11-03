@@ -205,38 +205,42 @@ class AnimationScene extends Phaser.Scene {
         );
         
         this.sprite.setDisplaySize(this.frameSize, this.frameSize);
-        this.sprite.setInteractive({ useHandCursor: true });
+        
+        // 修改精灵的交互设置
+        this.sprite.setInteractive({ draggable: true, useHandCursor: true });
 
-        // 修改 create 方法中的事件处理部分
+        // 使用精灵的事件而不是场景的事件
         this.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-            this.dragStartTime = Date.now();
+            this.dragStartTime = pointer.time;
             this.dragStartX = pointer.x;
             this.dragStartY = pointer.y;
-            this.isDragging = false; // 初始设置为 false
+            this.isDragging = false;
         });
 
-        this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-            if (this.sprite && this.dragStartTime > 0) {
-                const deltaX = Math.abs(pointer.x - this.dragStartX);
-                const deltaY = Math.abs(pointer.y - this.dragStartY);
+        this.sprite.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+            if (this.dragStartTime === 0) return;
+
+            const dragDistance = Phaser.Math.Distance.Between(
+                this.dragStartX,
+                this.dragStartY,
+                pointer.x,
+                pointer.y
+            );
+
+            if (dragDistance > this.MOVE_THRESHOLD) {
+                this.isDragging = true;
+                this.currentState = 'drag';
+                this.playCurrentState();
                 
-                // 如果移动距离超过阈值，则认为是拖拽
-                if (deltaX > this.MOVE_THRESHOLD || deltaY > this.MOVE_THRESHOLD) {
-                    this.isDragging = true;
-                    this.currentState = 'drag';
-                    this.playCurrentState();
-                    this.sprite.x = pointer.x;
-                    this.sprite.y = pointer.y;
-                }
+                this.sprite!.x = pointer.x;
+                this.sprite!.y = pointer.y;
             }
         });
 
-        this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
-            const clickDuration = Date.now() - this.dragStartTime;
+        this.sprite.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+            const clickDuration = pointer.time - this.dragStartTime;
             
-            if (this.isDragging && this.sprite) {
-                // 处理拖拽结束
-                this.isDragging = false;
+            if (this.isDragging) {
                 this.currentState = 'fall';
                 this.playCurrentState();
 
@@ -250,10 +254,10 @@ class AnimationScene extends Phaser.Scene {
                     }
                 });
             } else if (clickDuration < this.CLICK_THRESHOLD) {
-                // 处理点击事件
                 this.nextState();
             }
-            
+
+            this.isDragging = false;
             this.dragStartTime = 0;
         });
 
@@ -287,6 +291,9 @@ class AnimationScene extends Phaser.Scene {
 
 class BottomAnimation {
     private game: Phaser.Game;
+    private containerId: string;
+    private resizeHandler: () => void;
+    private sceneInstance: AnimationScene;
 
     constructor({ 
         config, 
@@ -295,28 +302,52 @@ class BottomAnimation {
         frameRate = 9, 
         container 
     }: BottomAnimationProps & { container: HTMLElement }) {
+        this.containerId = container.id;
+        container.style.pointerEvents = 'auto';
+        
+        this.sceneInstance = new AnimationScene(config, initialState, frameRate);
+        this.resizeHandler = this.handleResize.bind(this);
+        
         this.game = new Phaser.Game({
             type: Phaser.AUTO,
             width: window.innerWidth,
             height: 200,
             transparent: true,
             parent: container,
-            scene: new AnimationScene(config, initialState, frameRate),
+            scene: this.sceneInstance,
             scale: {
-                mode: Phaser.Scale.NONE,
+                mode: Phaser.Scale.NONE,  // Changed from RESIZE to NONE
                 autoCenter: Phaser.Scale.CENTER_HORIZONTALLY
+            },
+            input: {
+                activePointers: 4
             }
         });
 
-        window.addEventListener('resize', this.handleResize.bind(this));
+        // Initial resize
+        this.handleResize();
+        window.addEventListener('resize', this.resizeHandler);
     }
 
     private handleResize() {
-        this.game.scale.resize(window.innerWidth, 200);
+        const container = document.getElementById(this.containerId);
+        if (container && this.game && this.game.scale) {
+            const width = window.innerWidth;
+            const height = 200;
+            
+            // Update game size
+            this.game.scale.resize(width, height);
+            
+            // Update scene camera
+            if (this.sceneInstance && this.sceneInstance.cameras) {
+                this.sceneInstance.cameras.main.setViewport(0, 0, width, height);
+            }
+        }
     }
 
     destroy() {
-        window.removeEventListener('resize', this.handleResize.bind(this));
+        // Remove the event listener using the stored handler
+        window.removeEventListener('resize', this.resizeHandler);
         if (this.game) {
             this.game.destroy(true);
         }

@@ -29,7 +29,7 @@ export const Shop: React.FC<Props> = ({
   const addCoins = useGameStore(state => state.addCoins);
 
   return (
-    <div className="rpg-panel rpg-border p-6 rounded-lg">
+    <div className="rpg-panel rpg-border p-6 rounded-lg" style={{zIndex: 10}}>
       <h2 className="text-2xl font-bold mb-4 text-yellow-100 text-shadow">商店</h2>
       <div className="space-y-4">
         <div className="grid grid-cols-4 gap-4">

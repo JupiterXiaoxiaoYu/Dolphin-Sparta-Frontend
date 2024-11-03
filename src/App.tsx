@@ -124,60 +124,51 @@ function App() {
 
   return (
     <div className="ocean-bg min-h-screen p-8 relative">
-      <div className="wave-container">
-        <div className="wave" />
-        <div className="wave" />
-        <div className="wave" />
+      {/* 背景元素 */}
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <div className="wave-container">
+          <div className="wave" />
+          <div className="wave" />
+          <div className="wave" />
+        </div>
+        <div className="water-caustics" />
+        <div className="floating-bubbles" />
       </div>
-      <div className="water-caustics" />
-      <div className="floating-bubbles" />
-      
-      <h1 
-        className="text-4xl font-bold text-center mb-8 text-white relative"
-        style={{
-          textShadow: "0 0 10px #4a9eff, 0 0 20px #4a9eff, 0 2px 0 #000"
-        }}
-      >
-        海豚斯巴达牧场
-      </h1>
-      
-      <Shop
-        coins={coins}
-        food={food}
-        medicine={medicine}
-        maxSlots={maxSlots}
-        dolphins={dolphins.length}
-        onBuyFood={buyFood}
-        onBuyMedicine={buyMedicine}
-        onBuyDolphin={addDolphin}
-        onBuySlot={buySlot}
-        onCollectAllCoins={collectAllCoins}
-      />
 
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-10">
-        {dolphins.map(dolphin => (
-          <Dolphin
-            key={dolphin.id}
-            dolphin={dolphin}
-            onFeed={() => feedDolphin(dolphin.id)}
-            onHeal={() => healDolphin(dolphin.id)}
-            onCollect={() => collectCoins(dolphin.id)}
-            onSell={() => sellDolphin(dolphin.id)}
-          />
-        ))}
-      </div>
-      
-      {[...Array(6)].map((_, i) => (
-        <div
-          key={i}
-          className="seaweed"
-          style={{
-            left: `${(i + 1) * 15}%`,
-            animationDelay: `${-i * 0.5}s`
-          }}
+      {/* UI元素 */}
+      <div style={{ position: 'relative', zIndex: 10 }}>
+        <h1 className="text-4xl font-bold text-center mb-8 text-white relative">
+          海豚斯巴达牧场
+        </h1>
+        
+        <Shop
+          coins={coins}
+          food={food}
+          medicine={medicine}
+          maxSlots={maxSlots}
+          dolphins={dolphins.length}
+          onBuyFood={buyFood}
+          onBuyMedicine={buyMedicine}
+          onBuyDolphin={addDolphin}
+          onBuySlot={buySlot}
+          onCollectAllCoins={collectAllCoins}
         />
-      ))}
-      <div className="coral-decoration" />
+
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {dolphins.map(dolphin => (
+            <Dolphin
+              key={dolphin.id}
+              dolphin={dolphin}
+              onFeed={() => feedDolphin(dolphin.id)}
+              onHeal={() => healDolphin(dolphin.id)}
+              onCollect={() => collectCoins(dolphin.id)}
+              onSell={() => sellDolphin(dolphin.id)}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* 精灵层 */}
       <PetPreview configs={spriteConfigs} />
     </div>
   );

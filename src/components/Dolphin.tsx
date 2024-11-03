@@ -37,7 +37,7 @@ export const Dolphin: React.FC<Props> = ({ dolphin, onFeed, onHeal, onCollect, o
   }, [dolphin.stage, dolphin.bornTime]);
 
   return (
-    <div className={`rpg-panel rpg-border p-4 rounded-lg ${dolphin.isIll ? 'bg-red-900/50' : ''}`}>
+    <div className={`rpg-panel rpg-border p-4 rounded-lg ${dolphin.isIll ? 'bg-red-900/50' : ''}`} style={{zIndex: 10}}>
       <div className="text-center">
         <div className="text-xl font-bold text-yellow-100 text-shadow mb-3">
           {dolphin.type === 'spear' ? '🔱' : '⚔️'} 

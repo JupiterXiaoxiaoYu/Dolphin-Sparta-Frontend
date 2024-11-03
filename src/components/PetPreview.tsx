@@ -61,13 +61,25 @@ export const PetPreview: React.FC<{ configs: ISpriteConfig[] }> = ({ configs }) 
       ref={containerRef} 
       style={{ 
         position: 'fixed',
-        bottom: 0,
+        top: 0,
         left: 0,
         width: '100vw',
-        height: '200px',
-        pointerEvents: 'auto',
-        zIndex: 9999
+        height: '100vh',
+        pointerEvents: 'none',
+        zIndex: 20
       }} 
-    />
+    >
+      <div 
+        id="game-container"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          pointerEvents: 'none'
+        }}
+      />
+    </div>
   );
 }; 

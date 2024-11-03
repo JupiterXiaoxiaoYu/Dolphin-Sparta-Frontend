@@ -110,8 +110,35 @@ class AnimationScene extends Phaser.Scene {
             config.name
         );
         
-        sprite.setDisplaySize(config.frameSize!, config.frameSize!);
-        sprite.setInteractive({ draggable: true, useHandCursor: true });
+        // 设置精灵的交互区域
+        sprite.setInteractive({ 
+            draggable: true,
+            useHandCursor: true,
+            pixelPerfect: true
+        });
+
+        // 获取 canvas 元素
+        const canvas = this.game.canvas;
+        
+        // 添加精灵事件监听器
+        sprite.on('pointerover', () => {
+            if (canvas) canvas.style.pointerEvents = 'auto';
+        });
+
+        sprite.on('pointerout', () => {
+            if (canvas) canvas.style.pointerEvents = 'none';
+        });
+
+        sprite.on('dragstart', () => {
+            if (canvas) canvas.style.pointerEvents = 'auto';
+        });
+
+        sprite.on('dragend', () => {
+            if (canvas) canvas.style.pointerEvents = 'none';
+        });
+
+        // 确保精灵在最上层
+        sprite.setDepth(1000);
 
         const spriteData = {
             sprite,
@@ -306,38 +333,55 @@ class BottomAnimation {
 
     constructor({ container }: { container: HTMLElement }) {
         this.containerId = container.id;
-        container.style.pointerEvents = 'auto';
         
         const scene = new AnimationScene();
+        
+        const gameContainer = container.querySelector('#game-container') as HTMLElement;
+        if (!gameContainer) {
+            throw new Error('Game container not found');
+        }
         
         this.game = new Phaser.Game({
             type: Phaser.AUTO,
             width: window.innerWidth,
-            height: 200,
+            height: window.innerHeight,
             transparent: true,
-            parent: container,
+            parent: gameContainer,
             scene: scene,
             scale: {
                 mode: Phaser.Scale.NONE,
                 autoCenter: Phaser.Scale.CENTER_HORIZONTALLY
             },
             input: {
-                activePointers: 4
+                activePointers: 4,
+                mouse: {
+                    preventDefaultDown: false,
+                    preventDefaultUp: false,
+                    preventDefaultMove: false,
+                    preventDefaultWheel: false
+                }
+            },
+            dom: {
+                createContainer: true
             },
             render: {
                 pixelArt: true
             }
         });
 
-        // 等待场景创建完成
         this.game.events.once('ready', () => {
             console.log('Game ready, initializing scene');
             this.scene = scene;
+            
+            if (this.scene) {
+                // 配置场景级别的输入
+                this.scene.input.setTopOnly(true);
+                this.scene.input.setGlobalTopOnly(true);
+            }
+            
             this.handleResize();
             
-            // 处理待处理的精灵
             if (this.pendingSprites.length > 0) {
-                console.log('Processing pending sprites:', this.pendingSprites.length);
                 this.pendingSprites.forEach(({ config, initialState, frameRate }) => {
                     this.scene!.addSprite(config, initialState, frameRate);
                 });
@@ -364,12 +408,10 @@ class BottomAnimation {
         const container = document.getElementById(this.containerId);
         if (container && this.game && this.game.scale) {
             const width = window.innerWidth;
-            const height = 200;
+            const height = window.innerHeight;
             
-            // Update game size
             this.game.scale.resize(width, height);
             
-            // Update scene camera
             if (this.scene && this.scene.cameras) {
                 this.scene.cameras.main.setViewport(0, 0, width, height);
             }

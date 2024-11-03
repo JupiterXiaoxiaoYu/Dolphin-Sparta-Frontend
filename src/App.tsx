@@ -123,21 +123,72 @@ function App() {
   );
 
   return (
-    <div className="ocean-bg min-h-screen p-8 relative">
-      {/* 背景元素 */}
-      <div style={{ position: 'relative', zIndex: 1 }}>
+    <div className="ocean-bg">
+      {/* 背景层 */}
+      <div className="absolute inset-0">
+        {/* 波浪 */}
         <div className="wave-container">
           <div className="wave" />
           <div className="wave" />
           <div className="wave" />
         </div>
+        
+        {/* 增加更多波纹，使用不同大小和动画延迟 */}
+        <div 
+          className="ripple ripple-small" 
+          style={{ 
+            left: '20%', 
+            top: '30%',
+          }} 
+        />
+        <div 
+          className="ripple ripple-medium" 
+          style={{ 
+            left: '70%', 
+            top: '25%',
+            animationDelay: '-2s'
+          }} 
+        />
+        <div 
+          className="ripple ripple-large" 
+          style={{ 
+            left: '40%', 
+            top: '60%',
+            animationDelay: '-4s'
+          }} 
+        />
+        <div 
+          className="ripple ripple-small" 
+          style={{ 
+            left: '85%', 
+            top: '70%',
+            animationDelay: '-1s'
+          }} 
+        />
+        <div 
+          className="ripple ripple-medium" 
+          style={{ 
+            left: '15%', 
+            top: '80%',
+            animationDelay: '-3s'
+          }} 
+        />
+        <div 
+          className="ripple ripple-large" 
+          style={{ 
+            left: '60%', 
+            top: '45%',
+            animationDelay: '-5s'
+          }} 
+        />
+
         <div className="water-caustics" />
         <div className="floating-bubbles" />
       </div>
 
-      {/* UI元素 */}
-      <div style={{ position: 'relative', zIndex: 10 }}>
-        <h1 className="text-4xl font-bold text-center mb-8 text-white relative">
+      {/* UI层 */}
+      <div className="relative z-10 p-8">
+        <h1 className="text-4xl font-bold text-center mb-8 text-white">
           海豚斯巴达牧场
         </h1>
         

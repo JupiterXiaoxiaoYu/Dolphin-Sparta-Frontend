@@ -184,8 +184,8 @@ class AnimationScene extends Phaser.Scene {
             this.anims.create({
                 key: animationKey,
                 frames: frames,
-                frameRate: 9,
-                repeat: -1
+                frameRate: stateName === 'fall' ? 3 : 9,
+                repeat: stateName === 'fall'? 1: -1
             });
         });
     }

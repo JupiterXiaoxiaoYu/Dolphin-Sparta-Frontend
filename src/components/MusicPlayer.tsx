@@ -19,24 +19,23 @@ export const MusicPlayer: React.FC = () => {
     '/music/Tempo - Voices.mp3',
     '/music/Tempo - Void.mp3',
     '/music/Tempo - Void(Beta1).mp3',
-    '/music/Tempo - 熊伽霖.mp3'
-]);
-
+    '/music/Tempo - Best.mp3'
+  ]);
 
   useEffect(() => {
-    // 预加载音频
     if (audioRef.current) {
       audioRef.current.src = tracks[currentTrackIndex];
       audioRef.current.load();
+      if (isPlaying) {
+        audioRef.current.play();
+      }
     }
-  }, [currentTrackIndex, tracks]);
+  }, [currentTrackIndex, tracks, isPlaying]);
 
-  // 处理音乐播放结束
   const handleTrackEnd = () => {
-    setCurrentTrackIndex((prevIndex) => (prevIndex + 1) % tracks.length);
+    playNext();
   };
 
-  // 切换播放状态
   const togglePlay = async () => {
     if (audioRef.current) {
       try {
@@ -52,15 +51,32 @@ export const MusicPlayer: React.FC = () => {
     }
   };
 
-  // 处理音频错误
+  const playPrevious = () => {
+    setCurrentTrackIndex((prevIndex) => 
+      prevIndex === 0 ? tracks.length - 1 : prevIndex - 1
+    );
+  };
+
+  const playNext = () => {
+    setCurrentTrackIndex((prevIndex) => 
+      (prevIndex + 1) % tracks.length
+    );
+  };
+
   const handleError = (e: React.SyntheticEvent<HTMLAudioElement, Event>) => {
     console.error('音频加载错误:', e);
-    // 尝试播放下一首
-    setCurrentTrackIndex((prevIndex) => (prevIndex + 1) % tracks.length);
+    playNext();
   };
 
   return (
-    <div className="fixed top-4 left-4 z-50">
+    <div className="fixed top-4 left-4 z-50 flex items-center gap-2">
+      <button
+        onClick={playPrevious}
+        className="rpg-button p-2 rounded-full bg-blue-900/50 hover:bg-blue-800/50 transition-all duration-200"
+        title="上一首"
+      >
+        <span className="text-xl">⏮️</span>
+      </button>
       <button
         onClick={togglePlay}
         className="rpg-button p-2 rounded-full bg-blue-900/50 hover:bg-blue-800/50 transition-all duration-200"
@@ -72,6 +88,16 @@ export const MusicPlayer: React.FC = () => {
           <span className="text-xl">🔈</span>
         )}
       </button>
+      <button
+        onClick={playNext}
+        className="rpg-button p-2 rounded-full bg-blue-900/50 hover:bg-blue-800/50 transition-all duration-200"
+        title="下一首"
+      >
+        <span className="text-xl">⏭️</span>
+      </button>
+      <span className="text-white text-sm opacity-80">
+        {`${currentTrackIndex + 1}/${tracks.length}`}
+      </span>
       <audio
         ref={audioRef}
         onEnded={handleTrackEnd}

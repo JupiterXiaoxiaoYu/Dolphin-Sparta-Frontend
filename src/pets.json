@@ -86,5 +86,28 @@
                 "frameMax": 1
             }
         }
+      },
+      {
+        "name": "Evil Whale",
+        "imageSrc": "Evil Whale.png",
+        "frameSize": 128,
+        "states": {
+            "drop": {
+                "spriteLine": 1,
+                "frameMax": 4
+            },
+            "emerge": {
+                "spriteLine": 2,
+                "frameMax": 4
+            },
+            "walk": {
+                "spriteLine": 3,
+                "frameMax": 4
+            },
+            "cry": {
+                "spriteLine": 4,
+                "frameMax": 4
+            }
+        }
       }
 ]

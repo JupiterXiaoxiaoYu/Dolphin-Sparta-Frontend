@@ -1,8 +1,13 @@
 import React, { useEffect, useRef, useMemo } from 'react';
-import BottomAnimation from './BottomAnimation';
+import {BottomAnimation} from './BottomAnimation';
 import { ISpriteConfig } from '../types/ISpriteConfig';
 
-export const PetPreview: React.FC<{ configs: ISpriteConfig[] }> = ({ configs }) => {
+interface Props {
+  configs: ISpriteConfig[];
+  onEvilWhaleRemoved: () => void;
+}
+
+export const PetPreview: React.FC<Props> = ({ configs, onEvilWhaleRemoved }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<BottomAnimation | null>(null);
   const initializedSpritesRef = useRef<Set<string>>(new Set());
@@ -18,7 +23,8 @@ export const PetPreview: React.FC<{ configs: ISpriteConfig[] }> = ({ configs }) 
     if (containerRef.current && !animationRef.current) {
       containerRef.current.id = 'pet-container';
       animationRef.current = new BottomAnimation({
-        container: containerRef.current
+        container: containerRef.current,
+        onEvilWhaleRemoved
       });
     }
   }, []);

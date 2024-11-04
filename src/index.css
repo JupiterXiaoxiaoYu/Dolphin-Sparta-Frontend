@@ -3,10 +3,12 @@
 @tailwind utilities;
 
 .ocean-bg {
-  background: linear-gradient(180deg, #0088ff 0%, #004080 100%);
+  background: url('/scene/Sega Genesis 32X - Ecco the Dolphin - The Lagoon Background.png') no-repeat center center;
+  background-size: auto 100%;
   position: relative;
   overflow: hidden;
   min-height: 100vh;
+  background-color: #004080;
 }
 
 .wave-container {

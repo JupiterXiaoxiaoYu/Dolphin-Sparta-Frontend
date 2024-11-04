@@ -7,6 +7,7 @@ interface Props {
   medicine: number;
   maxSlots: number;
   dolphins: number;
+  showEvilWhale: boolean;
   onBuyFood: (amount: number) => void;
   onBuyMedicine: (amount: number) => void;
   onBuyDolphin: (type: 'spear' | 'sword') => void;
@@ -20,6 +21,7 @@ export const Shop: React.FC<Props> = ({
   medicine,
   maxSlots,
   dolphins,
+  showEvilWhale,
   onBuyFood, 
   onBuyMedicine,
   onBuyDolphin,
@@ -86,7 +88,10 @@ export const Shop: React.FC<Props> = ({
           </button>
           <button
             onClick={onCollectAllCoins}
-            className="rpg-button px-4 py-2 rounded bg-red-900/50 hover:bg-red-800/50"
+            disabled={showEvilWhale}
+            className={`rpg-button px-4 py-2 rounded bg-red-900/50 hover:bg-red-800/50 ${
+              showEvilWhale ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
           >
             对抗邪恶巨鲸
           </button>

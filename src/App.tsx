@@ -54,6 +54,30 @@ const SPRITE_CONFIG: ISpriteConfig = {
   }
 };
 
+const EVIL_WHALE_CONFIG: ISpriteConfig = {
+  "name": "Evil Whale",
+  "imageSrc": "Evil Whale.png",
+  "frameSize": 128,
+  "states": {
+    "drop": {
+      "spriteLine": 1,
+      "frameMax": 4
+    },
+    "walk": {
+      "spriteLine": 2,
+      "frameMax": 4
+    },
+    "attack": {
+      "spriteLine": 3,
+      "frameMax": 4
+    },
+    "cry": {
+      "spriteLine": 4,
+      "frameMax": 4
+    }
+  }
+};
+
 function App() {
   const { 
     coins, 
@@ -72,6 +96,8 @@ function App() {
     sellDolphin,
     collectAllCoins
   } = useGameStore();
+
+  const [showEvilWhale, setShowEvilWhale] = useState(false);
 
   const updateCoins = useCallback(() => {
     useGameStore.setState(state => ({
@@ -114,14 +140,18 @@ function App() {
     };
   }, []);
 
-  const spriteConfigs = useMemo(() => 
-    dolphins.map((dolphin, index) => ({
+  const spriteConfigs = useMemo(() => [
+    ...dolphins.map((dolphin, index) => ({
       ...SPRITE_CONFIG,
       id: dolphin.id,
       name: `Starphin-${dolphin.id}`
-    })), 
-    [dolphins]
-  );
+    })),
+    ...(showEvilWhale ? [{
+      ...EVIL_WHALE_CONFIG,
+      id: 'evil-whale',
+      name: 'Evil-Whale'
+    }] : [])
+  ], [dolphins, showEvilWhale]);
 
   return (
     <div className="ocean-bg">
@@ -202,11 +232,15 @@ function App() {
           medicine={medicine}
           maxSlots={maxSlots}
           dolphins={dolphins.length}
+          showEvilWhale={showEvilWhale}
           onBuyFood={buyFood}
           onBuyMedicine={buyMedicine}
           onBuyDolphin={addDolphin}
           onBuySlot={buySlot}
-          onCollectAllCoins={collectAllCoins}
+          onCollectAllCoins={() => {
+            collectAllCoins();
+            setShowEvilWhale(true);
+          }}
         />
 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -224,7 +258,10 @@ function App() {
       </div>
 
       {/* 精灵层 */}
-      <PetPreview configs={spriteConfigs} />
+      <PetPreview 
+        configs={spriteConfigs} 
+        onEvilWhaleRemoved={() => setShowEvilWhale(false)} 
+      />
     </div>
   );
 }

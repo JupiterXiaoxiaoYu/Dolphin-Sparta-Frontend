@@ -99,6 +99,7 @@ function App() {
   } = useGameStore();
 
   const [showEvilWhale, setShowEvilWhale] = useState(false);
+  const [showDolphinStatus, setShowDolphinStatus] = useState(true);
 
   const updateCoins = useCallback(() => {
     useGameStore.setState(state => ({
@@ -156,7 +157,7 @@ function App() {
 
   return (
     <div className="ocean-bg">
-      {/* 添加音乐播放器 */}
+      {/* 添加音乐���放器 */}
       <MusicPlayer />
       
       {/* 背景层 */}
@@ -243,20 +244,24 @@ function App() {
             collectAllCoins();
             setShowEvilWhale(true);
           }}
+          showDolphinStatus={showDolphinStatus}
+          onToggleDolphinStatus={() => setShowDolphinStatus(!showDolphinStatus)}
         />
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {dolphins.map(dolphin => (
-            <Dolphin
-              key={dolphin.id}
-              dolphin={dolphin}
-              onFeed={() => feedDolphin(dolphin.id)}
-              onHeal={() => healDolphin(dolphin.id)}
-              onCollect={() => collectCoins(dolphin.id)}
-              onSell={() => sellDolphin(dolphin.id)}
-            />
-          ))}
-        </div>
+        {showDolphinStatus && (
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {dolphins.map(dolphin => (
+              <Dolphin
+                key={dolphin.id}
+                dolphin={dolphin}
+                onFeed={() => feedDolphin(dolphin.id)}
+                onHeal={() => healDolphin(dolphin.id)}
+                onCollect={() => collectCoins(dolphin.id)}
+                onSell={() => sellDolphin(dolphin.id)}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 精灵层 */}

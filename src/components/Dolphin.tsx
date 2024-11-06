@@ -47,23 +47,27 @@ export const Dolphin: React.FC<Props> = ({ dolphin, onFeed, onHeal, onCollect, o
         
         <div className="space-y-3">
           <div>
-            <div className="text-sm text-yellow-100 mb-1">饱食度</div>
-            <div className="stat-bar">
-              <div 
-                className="stat-bar-fill satiety-bar"
-                style={{ width: `${dolphin.satiety}%` }}
-              />
+            <div className="flex items-center gap-2">
+              <div className="text-sm text-yellow-100 w-16">饱食度</div>
+              <div className="stat-bar flex-1">
+                <div 
+                  className="stat-bar-fill satiety-bar"
+                  style={{ width: `${dolphin.satiety}%` }}
+                />
+              </div>
             </div>
           </div>
 
           {!isWarrior && (
             <div>
-              <div className="text-sm text-yellow-100 mb-1">成长进度</div>
-              <div className="stat-bar">
-                <div 
-                  className="stat-bar-fill growth-bar"
-                  style={{ width: `${dolphin.growthProgress}%` }}
-                />
+              <div className="flex items-center gap-2">
+                <div className="text-sm text-yellow-100 w-16">成长进度</div>
+                <div className="stat-bar flex-1">
+                  <div 
+                    className="stat-bar-fill growth-bar"
+                    style={{ width: `${dolphin.growthProgress}%` }}
+                  />
+                </div>
               </div>
               <div className="text-xs text-yellow-200 mt-1">
                 预计成年: {timeLeft}
@@ -79,7 +83,6 @@ export const Dolphin: React.FC<Props> = ({ dolphin, onFeed, onHeal, onCollect, o
           >
             喂食
           </button>
-          
 
           {dolphin.isIll && (
             <button

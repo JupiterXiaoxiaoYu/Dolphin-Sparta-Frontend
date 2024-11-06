@@ -16,6 +16,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   medicine: 2,
   maxSlots: 3,
   dolphins: [],
+  dolphinCoins: 0,
 
   addCoins: (amount: number) => {
     set(state => ({
@@ -171,6 +172,18 @@ export const useGameStore = create<GameState>((set, get) => ({
         ...d,
         coins: 0
       }))
+    }));
+  },
+
+  spendCoins: (amount: number) => {
+    set(state => ({
+      coins: state.coins - amount
+    }));
+  },
+
+  addDolphinCoins: (amount: number) => {
+    set(state => ({
+      dolphinCoins: state.dolphinCoins + amount
     }));
   },
 }));

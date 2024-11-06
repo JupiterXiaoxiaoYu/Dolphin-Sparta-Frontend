@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { ISpriteConfig } from '../types/ISpriteConfig';
+import { useGameStore } from '../store/gameStore';
 
 interface BottomAnimationProps {
     config: ISpriteConfig;
@@ -689,6 +690,8 @@ class AnimationScene extends Phaser.Scene {
             if (name.includes('Evil-Whale')) {
                 if (this.onEvilWhaleRemoved) {
                     this.onEvilWhaleRemoved();
+                    // 添加海豚币奖励
+                    useGameStore.getState().addDolphinCoins(50);
                 }
                 this.sprites.forEach(otherSprite => {
                     if (!otherSprite.config.name.includes('Evil-Whale')) {

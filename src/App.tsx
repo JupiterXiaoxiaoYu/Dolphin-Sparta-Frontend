@@ -85,6 +85,7 @@ function App() {
     medicine,
     maxSlots,
     dolphins, 
+    dolphinCoins,
     addDolphin, 
     feedDolphin,
     healDolphin,
@@ -231,6 +232,7 @@ function App() {
           food={food}
           medicine={medicine}
           maxSlots={maxSlots}
+          dolphinCoins={dolphinCoins}
           dolphins={dolphins.length}
           showEvilWhale={showEvilWhale}
           onBuyFood={buyFood}
@@ -243,7 +245,7 @@ function App() {
           }}
         />
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {dolphins.map(dolphin => (
             <Dolphin
               key={dolphin.id}

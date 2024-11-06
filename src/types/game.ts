@@ -13,11 +13,13 @@ export interface Dolphin {
 
 export interface GameState {
   coins: number;
+  dolphinCoins: number;
   food: number;
   medicine: number;
   maxSlots: number;
   dolphins: Dolphin[];
   addCoins: (amount: number) => void;
+  addDolphinCoins: (amount: number) => void;
   addDolphin: (type: 'spear' | 'sword') => void;
   updateGrowthProgress: () => void;
   feedDolphin: (id: string) => void;
@@ -28,4 +30,5 @@ export interface GameState {
   buySlot: () => void;
   sellDolphin: (id: string) => void;
   collectAllCoins: () => void;
+  spendCoins: (amount: number) => void;
 }

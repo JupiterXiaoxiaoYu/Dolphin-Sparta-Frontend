@@ -4,6 +4,7 @@ import { useGameStore } from '../store/gameStore';
 interface Props {
   coins: number;
   food: number;
+  dolphinCoins: number;
   medicine: number;
   maxSlots: number;
   dolphins: number;
@@ -22,6 +23,7 @@ export const Shop: React.FC<Props> = ({
   maxSlots,
   dolphins,
   showEvilWhale,
+  dolphinCoins,
   onBuyFood, 
   onBuyMedicine,
   onBuyDolphin,
@@ -32,9 +34,9 @@ export const Shop: React.FC<Props> = ({
 
   return (
     <div className="rpg-panel rpg-border p-6 rounded-lg" style={{zIndex: 10}}>
-      <h2 className="text-2xl font-bold mb-4 text-yellow-100 text-shadow">商店</h2>
+      <h2 className="text-2xl font-bold mb-4 text-yellow-100 text-shadow">阿尔特米斯·奥提亚神庙</h2>
       <div className="space-y-4">
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-5 gap-4">
           <div className="rpg-panel p-3 rounded">
             <p className="font-bold text-yellow-100">
               <span className="coin-icon"></span>
@@ -45,6 +47,12 @@ export const Shop: React.FC<Props> = ({
               >
                 +100
               </button>
+            </p>
+          </div>
+          <div className="rpg-panel p-3 rounded">
+            <p className="font-bold text-yellow-100">
+              <span className="coin-icon blue-coin"></span>
+              海豚币: {dolphinCoins}
             </p>
           </div>
           <div className="rpg-panel p-3 rounded">
@@ -87,13 +95,18 @@ export const Shop: React.FC<Props> = ({
             购买栏位 (200金币)
           </button>
           <button
-            onClick={onCollectAllCoins}
-            disabled={showEvilWhale}
+                onClick={() => {
+                  if (coins >= 1000) {
+                      onCollectAllCoins();
+                      useGameStore.getState().spendCoins(1000);
+                  }
+              }}
+            disabled={showEvilWhale || coins < 1000}
             className={`rpg-button px-4 py-2 rounded bg-red-900/50 hover:bg-red-800/50 ${
               showEvilWhale ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
-            对抗邪恶巨鲸
+            对抗邪恶巨鲸(1000金币)
           </button>
         </div>
 

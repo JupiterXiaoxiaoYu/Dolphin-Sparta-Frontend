@@ -5,16 +5,18 @@ import { Alert } from './Alert';
 interface Props {
   coins: number;
   food: number;
-  dolphinCoins: number;
   medicine: number;
   maxSlots: number;
   dolphins: number;
   showEvilWhale: boolean;
+  dolphinCoins: number;
+  pendingCoins: number;
   onBuyFood: (amount: number) => void;
   onBuyMedicine: (amount: number) => void;
   onBuyDolphin: (type: 'spear' | 'sword') => void;
   onBuySlot: () => void;
   onCollectAllCoins: () => void;
+  onFightEvilWhale: () => void;
   onToggleDolphinStatus: () => void;
   showDolphinStatus: boolean;
 }
@@ -27,11 +29,13 @@ export const Shop: React.FC<Props> = ({
   dolphins,
   showEvilWhale,
   dolphinCoins,
+  pendingCoins,
   onBuyFood, 
   onBuyMedicine,
   onBuyDolphin,
   onBuySlot,
   onCollectAllCoins,
+  onFightEvilWhale,
   onToggleDolphinStatus,
   showDolphinStatus
 }) => {
@@ -81,8 +85,7 @@ export const Shop: React.FC<Props> = ({
       showAlert('金币不足，无法请求海豚神能量加持以对抗邪恶巨鲸');
       return;
     }
-    onCollectAllCoins();
-    useGameStore.getState().spendCoins(1000);
+    onFightEvilWhale()
   };
 
   if (isMinimized) {
@@ -187,7 +190,7 @@ export const Shop: React.FC<Props> = ({
             </div>
           </div>
 
-          <div className="space-x-2 mt-4">
+          <div className="flex items-center space-x-2 mt-4">
             <button
               onClick={() => handleBuyDolphin('spear')}
               disabled={dolphins >= maxSlots}
@@ -207,13 +210,24 @@ export const Shop: React.FC<Props> = ({
               购买剑盾海豚 (150金币)
             </button>
             <button
+              onClick={onCollectAllCoins}
+              className="rpg-button px-4 py-2 rounded flex items-center"
+            >
+              一键收取金币
+              {pendingCoins > 0 && (
+                <span className="ml-2 bg-yellow-500/30 px-2 py-0.5 rounded-full text-sm">
+                  {pendingCoins}
+                </span>
+              )}
+            </button>
+            <button
               onClick={handleFightEvilWhale}
               disabled={showEvilWhale}
               className={`rpg-button px-4 py-2 rounded bg-red-900/50 hover:bg-red-800/50 ${
                 showEvilWhale ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              对抗邪恶巨鲸(1000金币)
+              对抗邪恶巨鲸 (1000金币)
             </button>
           </div>
         </div>

@@ -5,15 +5,14 @@ interface Props {
   dolphin: DolphinType;
   onFeed: () => void;
   onHeal: () => void;
-  onCollect: () => void;
   onSell: () => void;
 }
 
-export const Dolphin: React.FC<Props> = ({ dolphin, onFeed, onHeal, onCollect, onSell }) => {
+export const Dolphin: React.FC<Props> = ({ dolphin, onFeed, onHeal, onSell }) => {
   const isWarrior = dolphin.stage === 'warrior';
   const [timeLeft, setTimeLeft] = useState<string>('');
 
-  const GROWTH_TIME = 60000;
+  const GROWTH_TIME = 3000;
 
   useEffect(() => {
     if (dolphin.stage === 'baby') {
@@ -58,6 +57,23 @@ export const Dolphin: React.FC<Props> = ({ dolphin, onFeed, onHeal, onCollect, o
             </div>
           </div>
 
+          {isWarrior && !dolphin.isIll && (
+            <div>
+              <div className="flex items-center gap-2">
+                <div className="text-sm text-yellow-100 w-16">金币收集</div>
+                <div className="stat-bar flex-1">
+                  <div 
+                    className="stat-bar-fill coin-bar"
+                    style={{ width: `${(dolphin.coins / 1000) * 100}%` }}
+                  />
+                </div>
+              </div>
+              <div className="text-xs text-yellow-200 mt-1">
+                金币存储：{dolphin.coins}/{1000}
+              </div>
+            </div>
+          )}
+
           {!isWarrior && (
             <div>
               <div className="flex items-center gap-2">
@@ -90,16 +106,6 @@ export const Dolphin: React.FC<Props> = ({ dolphin, onFeed, onHeal, onCollect, o
               className="rpg-button px-3 py-1 rounded text-sm"
             >
               治疗
-            </button>
-          )}
-
-          {isWarrior && !dolphin.isIll && dolphin.coins > 0 && (
-            <button
-              onClick={onCollect}
-              className="rpg-button px-3 py-1 rounded text-sm"
-            >
-              <span className="coin-icon"></span>
-              收集金币 ({dolphin.coins})
             </button>
           )}
 

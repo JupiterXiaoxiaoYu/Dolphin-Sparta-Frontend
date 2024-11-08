@@ -5,6 +5,9 @@ import { Dolphin } from './components/Dolphin';
 import { PetPreview } from './components/PetPreview';
 import { ISpriteConfig } from './types/ISpriteConfig';
 import { MusicPlayer } from './components/MusicPlayer';
+import { ConnectButton } from "thirdweb/react";
+import { useActiveAccount, useWalletBalance } from "thirdweb/react";
+import { client } from './client';
 
 // 在 App.tsx 组件外部定义
 const SPRITE_CONFIG: ISpriteConfig = {
@@ -86,37 +89,22 @@ function App() {
     maxSlots,
     dolphins, 
     dolphinCoins,
-    addDolphin, 
     feedDolphin,
     healDolphin,
     collectCoins, 
     buyFood,
     buyMedicine,
     buySlot,
+    buyDolphin,
     updateGrowthProgress,
+    updateCoinCollectionProgress,
     sellDolphin,
     collectAllCoins
   } = useGameStore();
 
+  const account = useActiveAccount();
   const [showEvilWhale, setShowEvilWhale] = useState(false);
   const [showDolphinStatus, setShowDolphinStatus] = useState(true);
-
-  const updateCoins = useCallback(() => {
-    useGameStore.setState(state => ({
-      dolphins: state.dolphins.map(dolphin => {
-        if (dolphin.stage === 'warrior' && !dolphin.isIll) {
-          const timeSinceLastFed = Date.now() - dolphin.lastFed;
-          if (timeSinceLastFed < 300000) {
-            return {
-              ...dolphin,
-              coins: dolphin.coins + (dolphin.type === 'spear' ? 2 : 3)
-            };
-          }
-        }
-        return dolphin;
-      })
-    }));
-  }, []);
 
   const updateSatiety = useCallback(() => {
     useGameStore.setState(state => ({
@@ -129,7 +117,16 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const coinsInterval = setInterval(updateCoins, 1000);
+    if (account?.address) {
+      useGameStore.getState().initializePlayer(account.address, "http://localhost:3000");
+      console.log("Player initialized successfully");
+    }
+  }, [account]);
+
+  useEffect(() => {
+    const coinsInterval = setInterval(() => {
+      useGameStore.getState().updateCoinCollectionProgress();
+    }, 1000);
     const satietyInterval = setInterval(updateSatiety, 30000);
     const growthInterval = setInterval(() => {
       useGameStore.getState().updateGrowthProgress();
@@ -155,9 +152,36 @@ function App() {
     }] : [])
   ], [dolphins, showEvilWhale]);
 
+  const pendingCoins = dolphins.reduce((sum, dolphin) => {
+    if (dolphin.stage === 'warrior' && !dolphin.isIll) {
+      return sum + dolphin.coins;
+    }
+    return sum;
+  }, 0);
+
   return (
     <div className="ocean-bg">
-      {/* 添加音乐���放器 */}
+      {/* Add ConnectButton */}
+      <div className="absolute top-4 right-1 z-20">
+      <ConnectButton
+      client={client}
+      // onConnect={async (wallet) => {
+      //   try {
+      //     if (account?.address) {
+      //       await useGameStore.getState().initializePlayer(
+      //         account.address,
+      //       "http://localhost:3000" // Your RPC URL
+      //       );
+      //       console.log("Player installed successfully");
+      //     }
+      //   } catch (error) {
+      //     console.error("Failed to install player:", error);
+      //   }
+      // }}
+      />
+      </div>
+
+      {/* 添加音乐放器 */}
       <MusicPlayer />
       
       {/* 背景层 */}
@@ -238,26 +262,27 @@ function App() {
           showEvilWhale={showEvilWhale}
           onBuyFood={buyFood}
           onBuyMedicine={buyMedicine}
-          onBuyDolphin={addDolphin}
+          onBuyDolphin={(type: "spear" | "sword") => buyDolphin(type === "spear" ? 1 : 2)}
           onBuySlot={buySlot}
-          onCollectAllCoins={() => {
-            collectAllCoins();
+          onCollectAllCoins={collectAllCoins}
+          onFightEvilWhale={() => {
             setShowEvilWhale(true);
+            useGameStore.getState().spendCoins(1000);
           }}
           showDolphinStatus={showDolphinStatus}
           onToggleDolphinStatus={() => setShowDolphinStatus(!showDolphinStatus)}
+          pendingCoins={pendingCoins}
         />
 
         {showDolphinStatus && (
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="mt-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
             {dolphins.map(dolphin => (
               <Dolphin
                 key={dolphin.id}
                 dolphin={dolphin}
-                onFeed={() => feedDolphin(dolphin.id)}
-                onHeal={() => healDolphin(dolphin.id)}
-                onCollect={() => collectCoins(dolphin.id)}
-                onSell={() => sellDolphin(dolphin.id)}
+                onFeed={() => feedDolphin(Number(dolphin.id))}
+                onHeal={() => healDolphin(Number(dolphin.id))}
+                onSell={() => sellDolphin(Number(dolphin.id))}
               />
             ))}
           </div>

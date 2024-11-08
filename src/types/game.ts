@@ -1,7 +1,12 @@
+import { Player } from "src/apis/api";
+
+export type DolphinType = 'spear' | 'sword';
+export type DolphinStage = 'baby' | 'warrior';
+
 export interface Dolphin {
   id: string;
-  type: 'spear' | 'sword';
-  stage: 'baby' | 'warrior';
+  type: DolphinType;
+  stage: DolphinStage;
   bornTime: number;
   lastFed: number;
   lastPetted: number;
@@ -12,23 +17,35 @@ export interface Dolphin {
 }
 
 export interface GameState {
+  player: Player | null;
+  loading: boolean;
+  error: string | null;
+  gameState: any;
   coins: number;
-  dolphinCoins: number;
   food: number;
   medicine: number;
   maxSlots: number;
   dolphins: Dolphin[];
+  dolphinCoins: number;
+
+  // API methods
+  initializePlayer: (key: string, rpcUrl: string) => Promise<void>;
+  buyDolphin: (type?: number) => Promise<void>;
+  buyFood: (amount: number) => Promise<void>;
+  buyMedicine: (amount: number) => Promise<void>;
+  feedDolphin: (dolphinId: number) => Promise<void>;
+  healDolphin: (dolphinId: number) => Promise<void>;
+  attackEvilWhale: () => Promise<void>;
+  buyPopulation: () => Promise<void>;
+  collectCoins: () => Promise<void>;
+  sellDolphin: (index: number) => Promise<void>;
+
+  // Local state methods
   addCoins: (amount: number) => void;
-  addDolphinCoins: (amount: number) => void;
-  addDolphin: (type: 'spear' | 'sword') => void;
-  updateGrowthProgress: () => void;
-  feedDolphin: (id: string) => void;
-  healDolphin: (id: string) => void;
-  collectCoins: (id: string) => void;
-  buyFood: (amount: number) => void;
-  buyMedicine: (amount: number) => void;
-  buySlot: () => void;
-  sellDolphin: (id: string) => void;
-  collectAllCoins: () => void;
   spendCoins: (amount: number) => void;
+  addDolphinCoins: (amount: number) => void;
+  updateGrowthProgress: () => void;
+  updateCoinCollectionProgress: () => void;
+  collectAllCoins: () => void;
+  buySlot: () => void;
 }

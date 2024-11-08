@@ -164,6 +164,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       console.log("Sell dolphin index", index);
       if (!player) throw new Error('Player not initialized');
       const state = await player.sellDolphin(index);
+      console.log("Sell dolphin state:", state);
       set(updateStateFromBackend(state));
     } catch (error) {
       set({ error: (error as Error).message, loading: false });

@@ -98,30 +98,16 @@ export class Player {
     async feedDolphin(dolphinId: number) {
         const state = await this.getState();
         let nonce = await this.getNonce();
-        if (!state.player.data.dolphins || !state.player.data.dolphins[dolphinId]) {
-            throw new Error(`Dolphin with index ${dolphinId} does not exist`);
-        }
         const dolphin = state.player.data.dolphins[dolphinId];
         console.log("Feeding dolphin:", dolphin);
-        
-        if (state.player.data.food_number <= 0) {
-            throw new Error('Not enough food');
-        }
         return this.sendGameCommand(CMD_FEED_DOLPHIN, nonce, Number(dolphin.id));
     }
 
     async healDolphin(dolphinId: number) {
         const state = await this.getState();
         let nonce = await this.getNonce();
-        if (!state.player.data.dolphins || !state.player.data.dolphins[dolphinId]) {
-            throw new Error(`Dolphin with index ${dolphinId} does not exist`);
-        }
         const dolphin = state.player.data.dolphins[dolphinId];
         console.log("Healing dolphin:", dolphin);
-        
-        if (state.player.data.medicine_number <= 0) {
-            throw new Error('Not enough medicine');
-        }
         return this.sendGameCommand(CMD_HEAL_DOLPHIN, nonce, Number(dolphin.id));
     }
 
@@ -146,9 +132,6 @@ export class Player {
     }
 
     async buyDolphin(dolphinType: number) {
-        if (dolphinType < 0 || dolphinType > 2) {
-            throw new Error('Invalid dolphin type. Must be 0 (Archer), 1 (Pikeman), or 2 (Warrior)');
-        }
         let nonce = await this.getNonce();
         return this.sendGameCommand(CMD_BUY_DOLPHIN, nonce, dolphinType);
     }
@@ -156,10 +139,6 @@ export class Player {
     async sellDolphin(dolphinIndex: number) {
         const state = await this.getState();
         
-        if (!state.player.data.dolphins || dolphinIndex >= state.player.data.dolphins.length) {
-            throw new Error(`Invalid dolphin index: ${dolphinIndex}`);
-        }
-
         const dolphin = state.player.data.dolphins[dolphinIndex];
         console.log("Attempting to sell dolphin:", {
             index: dolphinIndex,

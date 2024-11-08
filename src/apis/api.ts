@@ -96,19 +96,13 @@ export class Player {
     }
 
     async feedDolphin(dolphinId: number) {
-        const state = await this.getState();
         let nonce = await this.getNonce();
-        const dolphin = state.player.data.dolphins[dolphinId];
-        console.log("Feeding dolphin:", dolphin);
-        return this.sendGameCommand(CMD_FEED_DOLPHIN, nonce, Number(dolphin.id));
+        return this.sendGameCommand(CMD_FEED_DOLPHIN, nonce, Number(dolphinId));
     }
 
     async healDolphin(dolphinId: number) {
-        const state = await this.getState();
         let nonce = await this.getNonce();
-        const dolphin = state.player.data.dolphins[dolphinId];
-        console.log("Healing dolphin:", dolphin);
-        return this.sendGameCommand(CMD_HEAL_DOLPHIN, nonce, Number(dolphin.id));
+        return this.sendGameCommand(CMD_HEAL_DOLPHIN, nonce, Number(dolphinId));
     }
 
     async attackEvilWhale() {
@@ -138,7 +132,12 @@ export class Player {
 
     async sellDolphin(dolphinIndex: number) {
         const state = await this.getState();
-        
+        const dolphinlen = state.player.data.dolphins.length;
+        if (dolphinlen == 0) {
+            console.log("Invalid dolphin index:", dolphinIndex);
+            return;
+        }
+
         console.log("Attempting to sell dolphin:", {
             index: dolphinIndex,
         });

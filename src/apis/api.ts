@@ -139,11 +139,8 @@ export class Player {
     async sellDolphin(dolphinIndex: number) {
         const state = await this.getState();
         
-        const dolphin = state.player.data.dolphins[dolphinIndex];
         console.log("Attempting to sell dolphin:", {
             index: dolphinIndex,
-            dolphin: dolphin,
-            type: dolphin.name
         });
 
         let nonce = await this.getNonce();

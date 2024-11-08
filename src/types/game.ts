@@ -30,18 +30,18 @@ export interface GameState {
 
   // API methods
   initializePlayer: (key: string, rpcUrl: string) => Promise<void>;
-  buyDolphin: (type?: number) => Promise<void>;
+  buyDolphin: (type: number) => Promise<void>;
   buyFood: (amount: number) => Promise<void>;
   buyMedicine: (amount: number) => Promise<void>;
   feedDolphin: (dolphinId: number) => Promise<void>;
   healDolphin: (dolphinId: number) => Promise<void>;
   attackEvilWhale: () => Promise<void>;
+  addCoins: () => Promise<void>;
   buyPopulation: () => Promise<void>;
   collectCoins: () => Promise<void>;
   sellDolphin: (index: number) => Promise<void>;
 
   // Local state methods
-  addCoins: (amount: number) => void;
   spendCoins: (amount: number) => void;
   addDolphinCoins: (amount: number) => void;
   updateGrowthProgress: () => void;

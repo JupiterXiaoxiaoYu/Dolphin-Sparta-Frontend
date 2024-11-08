@@ -41,7 +41,6 @@ export const Shop: React.FC<Props> = ({
 }) => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [alert, setAlert] = useState<string | null>(null);
-  const addCoins = useGameStore(state => state.addCoins);
 
   const showAlert = (message: string) => {
     setAlert(message);
@@ -49,7 +48,7 @@ export const Shop: React.FC<Props> = ({
 
   const handleBuyFood = () => {
     if (coins < 50) {
-      showAlert('金币不足，无法购买食物');
+      showAlert('Insufficient coins to buy food');
       return;
     }
     onBuyFood(5);
@@ -57,7 +56,7 @@ export const Shop: React.FC<Props> = ({
 
   const handleBuyMedicine = () => {
     if (coins < 150) {
-      showAlert('金币不足，无法购买药品');
+      showAlert('Insufficient coins to buy medicine');
       return;
     }
     onBuyMedicine(5);
@@ -65,7 +64,7 @@ export const Shop: React.FC<Props> = ({
 
   const handleBuySlot = () => {
     if (coins < 200) {
-      showAlert('金币不足，无法购买栏位');
+      showAlert('Insufficient coins to buy slot');
       return;
     }
     onBuySlot();
@@ -74,18 +73,31 @@ export const Shop: React.FC<Props> = ({
   const handleBuyDolphin = (type: 'spear' | 'sword') => {
     const cost = type === 'spear' ? 100 : 150;
     if (coins < cost) {
-      showAlert(`金币不足，无法购买${type === 'spear' ? '长矛' : '剑盾'}海豚`);
+      showAlert(`Insufficient coins to buy ${type === 'spear' ? 'Spear' : 'Sword'} Dolphin`);
       return;
     }
     onBuyDolphin(type);
   };
 
-  const handleFightEvilWhale = () => {
+  const handleFightEvilWhale = async () => {
     if (coins < 1000) {
-      showAlert('金币不足，无法请求海豚神能量加持以对抗邪恶巨鲸');
+      showAlert('Insufficient coins to request Dolphin God power to fight Evil Whale');
       return;
     }
-    onFightEvilWhale()
+    try {
+      await useGameStore.getState().attackEvilWhale();
+      onFightEvilWhale();
+    } catch (error) {
+      showAlert((error as Error).message);
+    }
+  };
+
+  const handleAddCoins = async () => {
+    try {
+      await useGameStore.getState().addCoins();
+    } catch (error) {
+      showAlert((error as Error).message);
+    }
   };
 
   if (isMinimized) {
@@ -115,14 +127,14 @@ export const Shop: React.FC<Props> = ({
               alt="temple" 
               className="w-8 h-8 mr-2 inline-block align-middle"
             />
-            <span className="align-middle">阿尔特米斯·奥提亚·海豚神庙</span>
+            <span className="align-middle">Artemis Otia Dolphin Temple</span>
           </h2>
           <div className="flex items-center space-x-2">
             <button
               onClick={onToggleDolphinStatus}
               className="rpg-button px-3 py-1 rounded text-sm"
             >
-              {showDolphinStatus ? '隐藏' : '显示'}海豚状态
+              {showDolphinStatus ? 'Hide' : 'Show'} Dolphin Status
             </button>
             <button 
               onClick={() => setIsMinimized(true)}
@@ -137,9 +149,9 @@ export const Shop: React.FC<Props> = ({
             <div className="rpg-panel p-3 rounded">
               <p className="font-bold text-yellow-100 flex items-center">
                 <span className="inline-block w-5 h-5 mr-1 bg-contain bg-center bg-no-repeat" style={{backgroundImage: "url('/coin.png')"}}></span>
-                金币: {coins}
+                Coins: {coins}
                 <button
-                  onClick={() => addCoins(100)}
+                  onClick={handleAddCoins}
                   className="rpg-button px-2 py-1 rounded ml-2 text-xs"
                 >
                   +100
@@ -149,43 +161,43 @@ export const Shop: React.FC<Props> = ({
             <div className="rpg-panel p-3 rounded">
               <p className="font-bold text-yellow-100 flex items-center">
                 <span className="inline-block w-5 h-5 mr-1 bg-contain bg-center bg-no-repeat" style={{backgroundImage: "url('/dolphin-coin.png')"}}></span>
-                海豚币: {dolphinCoins}
+                Dolphin Token: {dolphinCoins}
               </p>
             </div>
             <div className="rpg-panel p-3 rounded flex items-center justify-between">
               <p className="font-bold text-yellow-100 flex items-center">
                 <span className="inline-block w-5 h-5 mr-1 bg-contain bg-center bg-no-repeat" style={{backgroundImage: "url('/food.png')"}}></span>
-                食物: {food}
+                Food: {food}
               </p>
               <button
                 onClick={() => handleBuyFood()}
                 className="rpg-button px-2 py-1 rounded text-xs ml-2"
               >
-                购买5个 (50金币)
+                Buy 5 (50 Coins)
               </button>
             </div>
             <div className="rpg-panel p-3 rounded flex items-center justify-between">
               <p className="font-bold text-yellow-100 flex items-center">
                 <span className="inline-block w-5 h-5 mr-1 bg-contain bg-center bg-no-repeat" style={{backgroundImage: "url('/medicine.png')"}}></span>
-                药品: {medicine}
+                Medicine: {medicine}
               </p>
               <button
                 onClick={() => handleBuyMedicine()}
                 className="rpg-button px-2 py-1 rounded text-xs ml-2"
               >
-                购买5个 (150金币)
+                Buy 5 (150 Coins)
               </button>
             </div>
             <div className="rpg-panel p-3 rounded flex items-center justify-between">
               <p className="font-bold text-yellow-100 flex items-center">
                 <span className="inline-block w-5 h-5 mr-1 bg-contain bg-center bg-no-repeat" style={{backgroundImage: "url('/slot.png')"}}></span>
-                栏位: {dolphins}/{maxSlots}
+                Population: {dolphins}/{maxSlots}
               </p>
               <button
                 onClick={() => handleBuySlot()}
                 className="rpg-button px-2 py-1 rounded text-xs ml-2"
               >
-                购买 (200金币)
+                Add 1 (200 Coins)
               </button>
             </div>
           </div>
@@ -198,7 +210,7 @@ export const Shop: React.FC<Props> = ({
                 dolphins >= maxSlots ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              购买长矛海豚 (100金币)
+              Buy Spear Dolphin (100 Coins) 
             </button>
             <button
               onClick={() => handleBuyDolphin('sword')}
@@ -207,13 +219,13 @@ export const Shop: React.FC<Props> = ({
                 dolphins >= maxSlots ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              购买剑盾海豚 (150金币)
+              Buy Sword Dolphin (150 Coins)
             </button>
             <button
               onClick={onCollectAllCoins}
               className="rpg-button px-4 py-2 rounded flex items-center"
             >
-              一键收取金币
+              Collect All Coins
               {pendingCoins > 0 && (
                 <span className="ml-2 bg-yellow-500/30 px-2 py-0.5 rounded-full text-sm">
                   {pendingCoins}
@@ -227,7 +239,7 @@ export const Shop: React.FC<Props> = ({
                 showEvilWhale ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              对抗邪恶巨鲸 (1000金币)
+              Fight Evil Whale (1000 Coins)
             </button>
           </div>
         </div>

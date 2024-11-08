@@ -142,7 +142,7 @@ export class Player {
 
     async addCoins() {
         let nonce = await this.getNonce();
-            return this.sendGameCommand(CMD_ADD_COINS, nonce);
+        return this.sendGameCommand(CMD_ADD_COINS, nonce);
     }
 
     async buyDolphin(dolphinType: number) {

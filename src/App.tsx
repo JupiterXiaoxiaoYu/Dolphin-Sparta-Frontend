@@ -6,8 +6,15 @@ import { PetPreview } from './components/PetPreview';
 import { ISpriteConfig } from './types/ISpriteConfig';
 import { MusicPlayer } from './components/MusicPlayer';
 import { ConnectButton } from "thirdweb/react";
-import { useActiveAccount, useWalletBalance } from "thirdweb/react";
+import { useActiveAccount } from "thirdweb/react";
 import { client } from './client';
+import { lightTheme } from "thirdweb/react";
+
+const customTheme = lightTheme({
+ colors: {
+  connectedButtonBg: '#4a9eff',
+ }
+})
 
 // 在 App.tsx 组件外部定义
 const SPRITE_CONFIG: ISpriteConfig = {
@@ -118,8 +125,13 @@ function App() {
 
   useEffect(() => {
     if (account?.address) {
-      useGameStore.getState().initializePlayer(account.address, "http://localhost:3000");
-      console.log("Player initialized successfully");
+      useGameStore.getState().initializePlayer(account.address, "http://localhost:3000")
+        .then(result => {
+          console.log("Player initialized successfully:", result);
+        })
+        .catch(error => {
+          console.error("Failed to initialize player:", error);
+        });
     }
   }, [account]);
 
@@ -164,20 +176,8 @@ function App() {
       {/* Add ConnectButton */}
       <div className="absolute top-4 right-1 z-20">
       <ConnectButton
-      client={client}
-      // onConnect={async (wallet) => {
-      //   try {
-      //     if (account?.address) {
-      //       await useGameStore.getState().initializePlayer(
-      //         account.address,
-      //       "http://localhost:3000" // Your RPC URL
-      //       );
-      //       console.log("Player installed successfully");
-      //     }
-      //   } catch (error) {
-      //     console.error("Failed to install player:", error);
-      //   }
-      // }}
+        client={client}
+        theme={customTheme}
       />
       </div>
 
@@ -249,7 +249,7 @@ function App() {
       {/* UI层 */}
       <div className="relative z-10 p-8">
         <h1 className="text-4xl font-bold text-center mb-8 text-white">
-          海豚斯巴达牧场
+          Dolphin Sparta Ranch
         </h1>
         
         <Shop
@@ -267,7 +267,6 @@ function App() {
           onCollectAllCoins={collectAllCoins}
           onFightEvilWhale={() => {
             setShowEvilWhale(true);
-            useGameStore.getState().spendCoins(1000);
           }}
           showDolphinStatus={showDolphinStatus}
           onToggleDolphinStatus={() => setShowDolphinStatus(!showDolphinStatus)}

@@ -42,6 +42,9 @@ export const Dolphin: React.FC<Props> = ({ dolphin, onFeed, onHeal, onSell }) =>
           {dolphin.type === 'spear' ? '🔱' : '⚔️'} 
           {isWarrior ? 'Sword Dolphin' : 'Little Dolphin'}
           {dolphin.isIll && ' 🤒'}
+          <span className="ml-2 text-sm text-yellow-300">
+              Level: {dolphin.level || 1}
+          </span>
         </div>
         
         <div className="space-y-3">

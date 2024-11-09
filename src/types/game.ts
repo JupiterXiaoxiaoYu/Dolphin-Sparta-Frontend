@@ -14,6 +14,7 @@ export interface Dolphin {
   isIll: boolean;
   coins: number;
   growthProgress: number;
+  level: number;
 }
 
 export interface GameState {

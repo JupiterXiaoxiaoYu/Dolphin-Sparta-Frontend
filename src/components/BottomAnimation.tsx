@@ -25,8 +25,10 @@ type SpriteData = {
     idleTimer: number;
     moveSpeed: number;
     collisionCount?: number;
+    level?: number;
     healthBar?: Phaser.GameObjects.Rectangle;
     healthBarBg?: Phaser.GameObjects.Rectangle;
+    glowEffect?: Phaser.GameObjects.Graphics;
 };
 
 class AnimationScene extends Phaser.Scene {
@@ -55,6 +57,10 @@ class AnimationScene extends Phaser.Scene {
 
     preload() {
         if (this.spritesToLoad.length === 0) return;
+
+        // Load the hurt sound
+        this.load.audio('hurt', '/sounds/hurt.mp3');
+        this.load.audio('victory', '/sounds/victory.mp3');
 
         // 只添加一次加载事件监听
         if (!this.load.listenerCount('complete')) {
@@ -190,10 +196,12 @@ class AnimationScene extends Phaser.Scene {
         } else {
             // 海豚设置更高的深度值
             sprite.setDepth(1000);
-            
+            const dolphinLevel = useGameStore.getState().dolphins.find(d => d.id === config.id)?.level 
+           
             spriteData = {
                 sprite,
                 config,
+                level: dolphinLevel,
                 currentState: initialState,
                 frameSize: config.frameSize!,
                 isDragging: false,
@@ -206,6 +214,9 @@ class AnimationScene extends Phaser.Scene {
                 idleTimer: 2000 + Math.random() * 4000,
                 moveSpeed: 1 + Math.random() * 2
             };
+            if (dolphinLevel) {
+                spriteData.glowEffect = this.createGlowEffect(spriteData, dolphinLevel);
+            }
         }
 
         sprite.setInteractive({ 
@@ -378,6 +389,13 @@ class AnimationScene extends Phaser.Scene {
             return;
         }
 
+        if(spriteData.currentState === 'fall'){
+            //延迟播放
+            setTimeout(() => {
+                this.sound.play('hurt');
+            }, 1000);
+        }
+
         const animationKey = `${spriteData.currentState}-${spriteData.config.name}`;
         if (this.anims.exists(animationKey)) {
             spriteData.sprite.play(animationKey);
@@ -428,7 +446,7 @@ class AnimationScene extends Phaser.Scene {
                     spriteA.sprite.getBounds(),
                     spriteB.sprite.getBounds()
                 )) {
-                    // 根据是否有Evil Whale决定碰撞概率
+                    // 根据是否有Evil Whale决定碰撞率
                     const collisionChance = evilWhale ? 0.8 : this.COLLISION_CHANCE;
                     if (Math.random() < collisionChance) {
                         this.handleCollision(spriteA, spriteB);
@@ -440,7 +458,7 @@ class AnimationScene extends Phaser.Scene {
     }
 
     private handleCollision(spriteDataA: SpriteData, spriteDataB: SpriteData) {
-        // 获取Evil Whale的spriteData
+        // 获Evil Whale的spriteData
         const evilWhaleData = spriteDataA.config.name.includes('Evil-Whale') ? spriteDataA : 
                              spriteDataB.config.name.includes('Evil-Whale') ? spriteDataB : null;
         
@@ -527,12 +545,13 @@ class AnimationScene extends Phaser.Scene {
     }
 
     private applyBounce(spriteData: SpriteData, velocity: { x: number, y: number }) {
-        // 如果是海豚，设置为drop状态
+        // If it's a dolphin, set to drop state
         if (!spriteData.config.name.includes('Evil-Whale')) {
             spriteData.currentState = 'drop';
         }
         this.playCurrentState(spriteData);
-        
+
+
         const windowWidth = window.innerWidth;
         const windowHeight = window.innerHeight;
         const scale = spriteData.config.name.includes('Evil-Whale') ? 4 : 1;
@@ -584,7 +603,7 @@ class AnimationScene extends Phaser.Scene {
                     ease: 'Bounce.Out',
                     onComplete: () => {
                         if (!spriteData.config.name.includes('Evil-Whale')) {
-                            // 落地后设置为walk状态并继续追逐巨鲸
+                            // 落地后设置为walk状态继续追逐巨鲸
                             spriteData.currentState = 'walk';
                             spriteData.currentBehavior = 'moving';
                             this.playCurrentState(spriteData);
@@ -670,11 +689,32 @@ class AnimationScene extends Phaser.Scene {
                 }
             }
         });
+
+        this.sprites.forEach(spriteData => {
+            // Update glow effect position if it exists
+            if (spriteData.glowEffect) {
+                spriteData.glowEffect.clear();
+                const radius = spriteData.frameSize * 0.6;
+                
+                // 重新绘制多层光晕
+                spriteData.glowEffect.lineStyle(3, spriteData.glowEffect.defaultStrokeColor, 0.2);
+                spriteData.glowEffect.strokeCircle(spriteData.sprite.x, spriteData.sprite.y, radius);
+                
+                spriteData.glowEffect.lineStyle(4, spriteData.glowEffect.defaultStrokeColor, 0.3);
+                spriteData.glowEffect.strokeCircle(spriteData.sprite.x, spriteData.sprite.y, radius * 0.85);
+                
+                spriteData.glowEffect.lineStyle(5, spriteData.glowEffect.defaultStrokeColor, 0.4);
+                spriteData.glowEffect.strokeCircle(spriteData.sprite.x, spriteData.sprite.y, radius * 0.7);
+            }
+        });
     }
 
     public removeSprite(name: string) {
         const spriteData = this.sprites.get(name);
         if (spriteData) {
+            if (spriteData.glowEffect) {
+                spriteData.glowEffect.destroy();
+            }
             // 移除血条
             if (spriteData.healthBar) {
                 spriteData.healthBar.destroy();
@@ -701,8 +741,8 @@ class AnimationScene extends Phaser.Scene {
                         // 先停止所有正在进行的动画
                         this.tweens.killTweensOf(otherSprite.sprite);
 
+                        this.sound.play('victory');
 
-                        
                         // 添加落地动画
                         this.tweens.add({
                             targets: otherSprite.sprite,
@@ -717,8 +757,8 @@ class AnimationScene extends Phaser.Scene {
                                 otherSprite.direction = otherSprite.targetX > otherSprite.sprite.x ? 1 : -1;
                                 otherSprite.sprite.setFlipX(otherSprite.direction < 0);
                                 otherSprite.moveSpeed = 1 + Math.random() * 2;
-                                otherSprite.currentState = 'walk';
-                                otherSprite.currentBehavior = 'moving';
+                                otherSprite.currentState = 'jump'; // Switch to jump state
+                                otherSprite.currentBehavior = 'idle'; // Stop current behavior
                                 otherSprite.idleTimer = 2000 + Math.random() * 4000;
                                 this.playCurrentState(otherSprite);
                             }
@@ -727,6 +767,63 @@ class AnimationScene extends Phaser.Scene {
                 });
             }
         }
+    }
+
+    private createGlowEffect(spriteData: SpriteData, level: number) {
+        const glow = this.add.graphics();
+        
+        // Set glow color based on level with higher intensity
+        let color;
+        switch (level) {
+            case 1:
+                color = 0xFFFFFF; // Bright White
+                break;
+            case 2:
+                color = 0x00FF44; // Bright Green
+                break;
+            case 3:
+                color = 0x4488FF; // Bright Blue
+                break;
+            case 4:
+                color = 0xFF4444; // Bright Red
+                break;
+            case 5:
+                color = 0xFFAA00; // Bright Orange
+                break;
+            default:
+                color = 0xFFFFFF;
+        }
+        
+        // Store the color for later use
+        (glow as any).defaultStrokeColor = color;
+        
+        // Draw multiple circles with higher alpha values
+        const radius = spriteData.frameSize * 0.6; // 增大基础半径
+        
+        // 从外到内画多层渐变光晕，使用更高的透明度
+        glow.lineStyle(3, color, 0.2);  // 更粗的线条
+        glow.strokeCircle(spriteData.sprite.x, spriteData.sprite.y, radius);
+        
+        glow.lineStyle(4, color, 0.3);
+        glow.strokeCircle(spriteData.sprite.x, spriteData.sprite.y, radius * 0.85);
+        
+        glow.lineStyle(5, color, 0.4);  // 最内层更明显
+        glow.strokeCircle(spriteData.sprite.x, spriteData.sprite.y, radius * 0.7);
+        
+        // Set the glow properties
+        glow.setDepth(spriteData.sprite.depth - 1);
+        
+        // Add a more pronounced pulsing animation
+        this.tweens.add({
+            targets: glow,
+            alpha: { from: 0.9, to: 0.5 },  // 更大的透明度范围
+            duration: 1200,  // 稍快的脉冲速度
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
+        
+        return glow;
     }
 }
 
@@ -790,7 +887,7 @@ export class BottomAnimation {
             this.scene = scene;
             
             if (this.scene) {
-                // 配置场景级别的输入
+                // 配置场景级别输入
                 this.scene.input.setTopOnly(true);
                 this.scene.input.setGlobalTopOnly(true);
             }

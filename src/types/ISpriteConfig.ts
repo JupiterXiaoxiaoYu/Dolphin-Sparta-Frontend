@@ -15,7 +15,7 @@ export interface ISpriteConfig {
     imageSrc: string;
     states: {
         [key: string]: ISpriteState;
-    };
+    }
 }
 
 export enum SpriteType {

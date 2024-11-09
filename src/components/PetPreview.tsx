@@ -1,23 +1,32 @@
 import React, { useEffect, useRef, useMemo } from 'react';
 import {BottomAnimation} from './BottomAnimation';
 import { ISpriteConfig } from '../types/ISpriteConfig';
+import { Dolphin } from '../types/game';
 
 interface Props {
   configs: ISpriteConfig[];
   onEvilWhaleRemoved: () => void;
+  dolphins: Dolphin[];
 }
 
-export const PetPreview: React.FC<Props> = ({ configs, onEvilWhaleRemoved }) => {
+export const PetPreview: React.FC<Props> = ({ configs, onEvilWhaleRemoved, dolphins }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<BottomAnimation | null>(null);
   const initializedSpritesRef = useRef<Set<string>>(new Set());
+  const bornSoundRef = useRef<HTMLAudioElement | null>(null);
+
+  // Initialize born sound
+  useEffect(() => {
+    bornSoundRef.current = new Audio('/sounds/born.mp3');
+  }, []);
 
   const memoizedConfigs = useMemo(() => {
     return configs.map(config => ({
       ...config,
-      name: `${config.name}-${config.id || Math.random().toString(36).substr(2, 9)}`
+      name: `${config.name}-${config.id || Math.random().toString(36).substr(2, 9)}`,
+      level: config.id ? dolphins.find(d => d.id === config.id)?.level : undefined
     }));
-  }, [configs]);
+  }, [configs, dolphins]);
 
   useEffect(() => {
     if (containerRef.current && !animationRef.current) {
@@ -38,6 +47,10 @@ export const PetPreview: React.FC<Props> = ({ configs, onEvilWhaleRemoved }) => 
     memoizedConfigs.forEach(config => {
       if (!currentSprites.has(config.name)) {
         console.log('Adding new sprite:', config.name);
+        // Play born sound when adding new dolphin (not Evil Whale)
+        if (!config.name.includes('Evil-Whale') && bornSoundRef.current) {
+          bornSoundRef.current.play().catch(console.error);
+        }
         animationRef.current?.addSprite(config);
         currentSprites.add(config.name);
       }

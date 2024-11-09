@@ -120,7 +120,7 @@ export const SWORD_DOLPHIN_CONFIG: ISpriteConfig = {
         "spriteLine": 5,
         "frameMax": 1
       },
-      "drag": {
+      "drXag": {
         "spriteLine": 6,
         "frameMax": 4
       },

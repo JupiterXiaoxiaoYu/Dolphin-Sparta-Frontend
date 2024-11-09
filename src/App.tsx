@@ -9,7 +9,7 @@ import { ConnectButton } from "thirdweb/react";
 import { useActiveAccount } from "thirdweb/react";
 import { client } from './client';
 import { lightTheme } from "thirdweb/react";
-import { SPRITE_CONFIG, EVIL_WHALE_CONFIG } from './types/spriteConfigs';
+import { SPEAR_DOLPHIN_CONFIG,SWORD_DOLPHIN_CONFIG, EVIL_WHALE_CONFIG } from './types/spriteConfigs';
 
 const customTheme = lightTheme({
  colors: {
@@ -82,7 +82,7 @@ function App() {
 
   const spriteConfigs = useMemo(() => [
     ...dolphins.map((dolphin, index) => ({
-      ...SPRITE_CONFIG,
+      ...(dolphin.type === 'spear' ? SPEAR_DOLPHIN_CONFIG : SWORD_DOLPHIN_CONFIG),
       id: dolphin.id,
       name: `Starphin-${dolphin.id}`
     })),
@@ -178,9 +178,9 @@ function App() {
 
       {/* UI层 */}
       <div className="relative z-10 p-8">
-        <h1 className="text-4xl font-bold text-center mb-8 text-white">
-          Dolphin Sparta Ranch
-        </h1>
+      <h1 className="text-4xl font-bold text-center mb-8" style={{ color: '#007BFF' }}>
+  Dolphin Sparta Ranch
+</h1>
         
         <Shop
           coins={coins}
@@ -192,7 +192,7 @@ function App() {
           showEvilWhale={showEvilWhale}
           onBuyFood={buyFood}
           onBuyMedicine={buyMedicine}
-          onBuyDolphin={(type: "spear" | "sword") => buyDolphin(type === "spear" ? 1 : 2)}
+          onBuyDolphin={(type: "spear" | "sword") => buyDolphin(type === "spear" ? 0 : 1)}
           onBuySlot={buySlot}
           onCollectAllCoins={collectAllCoins}
           onFightEvilWhale={() => {

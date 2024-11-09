@@ -197,7 +197,9 @@ class AnimationScene extends Phaser.Scene {
             // 海豚设置更高的深度值
             sprite.setDepth(1000);
             const dolphinLevel = useGameStore.getState().dolphins.find(d => d.id === config.id)?.level 
-           
+           // Adjust the scale for dolphins
+            const scale = 1.3; // Increase the scale factor slightly
+            sprite.setScale(scale);
             spriteData = {
                 sprite,
                 config,
@@ -403,7 +405,7 @@ class AnimationScene extends Phaser.Scene {
     }
 
     private nextState(spriteData: SpriteData) {
-        const states = Object.keys(spriteData.config.states).filter(state => state !== 'walk');
+        const states = Object.keys(spriteData.config.states).filter(state => state !== 'walk' && state !== 'drag' && state !== 'fall' && state!=="jump");
         const currentIndex = states.indexOf(spriteData.currentState);
         const nextIndex = (currentIndex + 1) % states.length;
         spriteData.currentState = states[nextIndex];
@@ -411,7 +413,7 @@ class AnimationScene extends Phaser.Scene {
     }
 
     private getRandomIdleState() {
-        const idleStates = ['stand', 'sit', 'greet'];
+        const idleStates = ['stand', 'happy', 'greet', 'eat',"music","victory"];
         return idleStates[Math.floor(Math.random() * idleStates.length)];
     }
 
@@ -741,6 +743,7 @@ class AnimationScene extends Phaser.Scene {
                         // 先停止所有正在进行的动画
                         this.tweens.killTweensOf(otherSprite.sprite);
 
+                        // 播放落地音效
                         this.sound.play('victory');
 
                         // 添加落地动画

@@ -1,16 +1,15 @@
 import { Player } from "src/apis/api";
 
 export type DolphinType = 'spear' | 'sword';
-export type DolphinStage = 'baby' | 'warrior';
 
 export interface Dolphin {
   id: string;
   type: DolphinType;
-  stage: DolphinStage;
   bornTime: number;
   lastFed: number;
   lastPetted: number;
   satiety: number;
+  life_stage: number;
   isIll: boolean;
   coins: number;
   growthProgress: number;

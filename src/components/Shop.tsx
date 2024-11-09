@@ -210,7 +210,7 @@ export const Shop: React.FC<Props> = ({
                 dolphins >= maxSlots ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              Buy Spear Dolphin (100 Coins) 
+              Buy Spear Dolphin (150 Coins) 
             </button>
             <button
               onClick={() => handleBuyDolphin('sword')}
@@ -219,7 +219,7 @@ export const Shop: React.FC<Props> = ({
                 dolphins >= maxSlots ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              Buy Sword Dolphin (150 Coins)
+              Buy Sword Dolphin (100 Coins)
             </button>
             <button
               onClick={onCollectAllCoins}

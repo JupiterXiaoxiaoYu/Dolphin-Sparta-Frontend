@@ -10,6 +10,7 @@ import { useActiveAccount } from "thirdweb/react";
 import { client } from './client';
 import { lightTheme } from "thirdweb/react";
 import { SPEAR_DOLPHIN_CONFIG,SWORD_DOLPHIN_CONFIG, EVIL_WHALE_CONFIG } from './types/spriteConfigs';
+import { updateStateFromBackend } from './utils/stateUtils';
 
 const customTheme = lightTheme({
  colors: {
@@ -65,6 +66,24 @@ function App() {
   }, [account]);
 
   useEffect(() => {
+    // Initial state update
+    const updatePlayerState = async () => {
+      const player = useGameStore.getState().player;
+      if (player) {
+        const state = await player.getState();
+        useGameStore.setState(updateStateFromBackend(state));
+      }
+    };
+    // Set up 5-second interval for state updates
+    const stateInterval = setInterval(updatePlayerState, 2000);
+
+    // Clean up interval on unmount
+    return () => {
+      clearInterval(stateInterval);
+    };
+  }, []);
+
+  useEffect(() => {
     const coinsInterval = setInterval(() => {
       useGameStore.getState().updateCoinCollectionProgress();
     }, 1000);
@@ -72,7 +91,6 @@ function App() {
     const growthInterval = setInterval(() => {
       useGameStore.getState().updateGrowthProgress();
     }, 1000);
-
     return () => {
       clearInterval(coinsInterval);
       clearInterval(satietyInterval);
@@ -94,7 +112,7 @@ function App() {
   ], [dolphins, showEvilWhale]);
 
   const pendingCoins = dolphins.reduce((sum, dolphin) => {
-    if (dolphin.stage === 'warrior' && !dolphin.isIll) {
+    if (dolphin.life_stage === 100 && !dolphin.isIll) {
       return sum + dolphin.coins;
     }
     return sum;

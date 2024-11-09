@@ -67,6 +67,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       const { player } = get();
       if (!player) throw new Error('Player not initialized');
       const state = await player.buyDolphin(type);
+      console.log("Buy dolphin state:", JSON.stringify(state, null, 2));
       set(updateStateFromBackend(state));
     } catch (error) {
       set({ error: (error as Error).message, loading: false });
@@ -115,13 +116,13 @@ export const useGameStore = create<GameState>((set, get) => ({
       const { player, dolphins } = get();
       if (!player) throw new Error('Player not initialized');
       const state = await player.healDolphin(dolphinId);
-  
+      
       // Update only the specific dolphin's state
       const updatedDolphins = dolphins.map(dolphin =>
         Number(dolphin.id) === dolphinId ? { ...dolphin, ...state } : dolphin
       );
-  
       set({ dolphins: updatedDolphins, loading: false });
+      console.log("Heal dolphin state:", state.player.data.dolphins);
     } catch (error) {
       set({ error: (error as Error).message, loading: false });
     }

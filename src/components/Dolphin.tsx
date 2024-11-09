@@ -9,13 +9,13 @@ interface Props {
 }
 
 export const Dolphin: React.FC<Props> = ({ dolphin, onFeed, onHeal, onSell }) => {
-  const isWarrior = dolphin.stage === 'warrior';
+  const isWarrior = dolphin.growthProgress === 100;
   const [timeLeft, setTimeLeft] = useState<string>('');
 
   const GROWTH_TIME = 3000;
 
   useEffect(() => {
-    if (dolphin.stage === 'baby') {
+    if (dolphin.growthProgress < 100) {
       const timer = setInterval(() => {
         const now = Date.now();
         const timePassed = now - dolphin.bornTime;
@@ -33,14 +33,14 @@ export const Dolphin: React.FC<Props> = ({ dolphin, onFeed, onHeal, onSell }) =>
 
       return () => clearInterval(timer);
     }
-  }, [dolphin.stage, dolphin.bornTime]);
+  }, [dolphin.growthProgress, dolphin.bornTime]);
 
   return (
     <div className={`rpg-panel rpg-border p-4 rounded-lg ${dolphin.isIll ? 'bg-red-900/50' : ''}`} style={{zIndex: 10}}>
       <div className="text-center">
         <div className="text-xl font-bold text-yellow-100 text-shadow mb-3">
           {dolphin.type === 'spear' ? '🔱' : '⚔️'} 
-          {isWarrior ? 'Sword Dolphin' : 'Little Dolphin'}
+          {isWarrior ? dolphin.type==='spear' ? 'Spear Dolphin' : 'Sword Dolphin' : 'Little Dolphin'}
           {dolphin.isIll && ' 🤒'}
           <span className="ml-2 text-sm text-yellow-300">
               Level: {dolphin.level || 1}
@@ -72,7 +72,7 @@ export const Dolphin: React.FC<Props> = ({ dolphin, onFeed, onHeal, onSell }) =>
                 </div>
               </div>
               <div className="text-xs text-yellow-200 mt-1">
-                Coin Collection: {dolphin.coins}/{1000}
+                Coin Collection: {dolphin.coins}/{1000 * dolphin.level}
               </div>
             </div>
           )}
@@ -87,9 +87,6 @@ export const Dolphin: React.FC<Props> = ({ dolphin, onFeed, onHeal, onSell }) =>
                     style={{ width: `${dolphin.growthProgress}%` }}
                   />
                 </div>
-              </div>
-              <div className="text-xs text-yellow-200 mt-1">
-                Time to Mature: {timeLeft}
               </div>
             </div>
           )}
@@ -116,7 +113,7 @@ export const Dolphin: React.FC<Props> = ({ dolphin, onFeed, onHeal, onSell }) =>
             onClick={onSell}
             className="rpg-button px-3 py-1 rounded text-sm bg-red-900/50 hover:bg-red-800/50"
           >
-            Sell ({Math.floor(dolphin.type === 'spear' ? 50 : 75)} Coins)
+            Sell ({Math.floor(dolphin.type === 'spear' ? 75 : 50)} Coins)
           </button>
         </div>
       </div>

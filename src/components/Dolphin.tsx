@@ -67,7 +67,7 @@ export const Dolphin: React.FC<Props> = ({ dolphin, onFeed, onHeal, onSell }) =>
                 <div className="stat-bar flex-1">
                   <div 
                     className="stat-bar-fill coin-bar"
-                    style={{ width: `${(dolphin.coins / 1000) * 100}%` }}
+                    style={{ width: `${(dolphin.coins / (1000 * dolphin.level)) * 100}%` }}
                   />
                 </div>
               </div>

@@ -1,4 +1,4 @@
-import { query, ZKWasmAppRpc, LeHexBN } from "zkwasm-ts-server";
+import { query, ZKWasmAppRpc, LeHexBN } from "zkwasm-minirollup-rpc";
 
 const CMD_INSTALL_PLAYER = 1n;
 
